@@ -1,0 +1,158 @@
+.shadow {
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.rounded {
+  border-radius: 1.5rem;
+}
+.wrapper {
+  width: 95%;
+  margin: auto;
+  box-shadow: 0 0 #0000, 0 0 #0000, 0 10px 15px -3px rgba(0, 0, 0, 0.1),
+    0 4px 6px -2px rgba(0, 0, 0, 0.05);
+}
+.container {
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 768px;
+  padding-bottom: 3rem;
+  padding-left: 1rem;
+  padding-right: 1rem;
+  color: rgba(55, 65, 81, 1);
+  width: 100%;
+}
+.title {
+  margin-top: 2.5rem;
+}
+.title h1 {
+  font-size: 2rem;
+  font-weight: 500;
+  letter-spacing: -0.025em;
+  line-height: 1;
+}
+.title span {
+  display: block;
+  font-size: 1.875rem;
+  font-weight: 300;
+  line-height: 2.25rem;
+  margin-bottom: 0.5rem;
+}
+
+.card {
+  align-items: center;
+  background-color: #5a228b;
+  border: none;
+  box-sizing: border-box;
+  color: rgba(55, 65, 81, 1);
+  display: grid;
+  grid-template-columns: 1fr;
+  margin-top: 2.5rem;
+}
+.card .text-container {
+  color: rgba(255, 255, 255, 1);
+  margin: auto;
+  padding: 2rem;
+}
+
+.card .text-container h2 {
+  font-size: 1.5rem;
+  line-height: 2rem;
+  position: relative;
+}
+.card .text-container h2 span {
+  margin-left: 2.5rem;
+}
+.card .text-container a {
+  background-color: rgba(255, 255, 255, 1);
+  border-radius: 0.75rem;
+  color: rgba(55, 65, 81, 1);
+  display: inline-block;
+  padding: 1rem 2rem;
+  text-decoration: inherit;
+}
+.card .text-container a:hover {
+  background-color: #f1e7fe;
+}
+.card .logo-container {
+  display: none;
+  justify-content: center;
+  padding-left: 2rem;
+  padding-right: 2rem;
+}
+.card .logo-container svg {
+  color: rgba(255, 255, 255, 1);
+  width: 66.666667%;
+}
+
+.form input {
+  border: 1px solid #f1e7fe;
+  padding: 5px;
+  margin: 5px;
+  width: 200px;
+}
+
+.form input[type='submit'] {
+  background: #9f5afd;
+  border-radius: 5px;
+  width: 200px;
+  color: #f1e7fe;
+}
+
+.form input[type='submit']:hover {
+  background: #8c14fc;
+  cursor: pointer;
+}
+
+.form select {
+  border: 1px solid #f1e7fe;
+  padding: 5px;
+  margin: 5px;
+  width: 200px;
+}
+
+.form h5 {
+    margin: 5px 0 0 5px;
+}
+
+.align-right {
+    display: block;
+    text-align: right;
+    margin: 10px 0 0 0;
+}
+
+.layer {
+    background: rgba(193, 154, 223, 0.367);
+    padding: 5px 20px 20px 20px;
+    border-radius: 5px;
+    margin-top: 10px;
+}
+
+.history-table {
+    border: 1px solid #f1e7fe;
+    font-size: 10px;
+    padding: 5px;
+    margin: 5px;
+}
+
+.history-table td {
+    border: 1px solid #f1e7fe;
+    font-size: 10px;
+    padding: 5px;
+}
+
+.history-table th {
+    border: 1px solid #f1e7fe;
+    font-size: 10px;
+    padding: 5px;
+}
+
+.frequently-address {
+    font-size: 10px;
+}
+
+.map-container {
+    border: 1px solid #f1e7fe;
+    padding: 5px;
+    margin: 5px;
+    width: 415px;
+}

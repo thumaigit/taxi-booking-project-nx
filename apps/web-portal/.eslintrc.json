@@ -1,0 +1,59 @@
+{
+  "extends": [
+    "plugin:@nrwl/nx/react-typescript",
+    "next",
+    "next/core-web-vitals",
+    "../../.eslintrc.json"
+  ],
+  "ignorePatterns": [
+    "!**/*",
+    ".next/**/*"
+  ],
+  "overrides": [
+    {
+      "files": [
+        "*.ts",
+        "*.tsx",
+        "*.js",
+        "*.jsx"
+      ],
+      "rules": {
+        "@next/next/no-html-link-for-pages": [
+          "error",
+          "apps/web-portal/pages"
+        ],
+        "import/no-extraneous-dependencies": [
+          "error",
+          {
+            "devDependencies": [
+              "**/*.spec.ts",
+              "**/*.spec.tsx",
+              "**/*.spec.js",
+              "**/*.spec.jsx",
+              "**/tests/testUtils.tsx"
+            ],
+            "optionalDependencies": false
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "*.ts",
+        "*.tsx"
+      ],
+      "rules": {}
+    },
+    {
+      "files": [
+        "*.js",
+        "*.jsx"
+      ],
+      "rules": {}
+    }
+  ],
+  "rules": {},
+  "env": {
+    "jest": true
+  }
+}

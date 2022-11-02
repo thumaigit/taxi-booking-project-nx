@@ -1,0 +1,46 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./dev.db"
+}
+
+model Ride {
+  id                            String                   @id @default(cuid())
+  user_id                       String                  
+  pickup_address                String
+  arrive_address                String
+  payment                       String
+  car_type                      String
+  user                          User                     @relation(fields: [user_id], references: [id])
+  created_at                    DateTime                 @default(now()) 
+  /// @HideField({ input: true })
+  updated_at                    DateTime                 @updatedAt 
+  /// @DtoUpdateOptional
+  /// @HideField({ input: true })
+}
+
+model User {
+  id                            String                   @id @default(cuid())
+  full_name                     String
+  phone_number                  String                   @unique
+  user_password                 String                   
+  user_type                     String                   
+  ride_history                  Ride[]                   
+  /// @DtoRelationCanCreateOnCreate
+  status                        String                   @default("OFFLINE")
+  current_address               String                   @default("")
+  firebase_token                String                   @default("")
+  created_at                    DateTime                 @default(now()) 
+  /// @HideField({ input: true })
+  updated_at                    DateTime                 @updatedAt 
+  /// @DtoUpdateOptional
+  /// @HideField({ input: true })
+}
+
+
