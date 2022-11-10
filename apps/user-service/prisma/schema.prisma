@@ -33,9 +33,9 @@ model User {
   user_type                     String                   
   ride_history                  Ride[]                   
   /// @DtoRelationCanCreateOnCreate
-  status                        String                   @default("OFFLINE")
-  current_address               String                   @default("")
-  firebase_token                String                   @default("")
+  status                        String?                   @default("OFFLINE")
+  current_address               String?                   @default("")
+  firebase_token                String?                   @default("")
   created_at                    DateTime                 @default(now()) 
   /// @HideField({ input: true })
   updated_at                    DateTime                 @updatedAt 

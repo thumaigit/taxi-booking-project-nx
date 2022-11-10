@@ -123,7 +123,7 @@ export class AppService {
     return loginUser;
   }
 
-  async createUser(dto: User): Promise<CreateUserResponse> {
+  async createUser(dto: any): Promise<CreateUserResponse> {
     const saltOrRounds = 10;
     const password = dto.user_password;
     const hash = await bcrypt.hash(password, saltOrRounds);

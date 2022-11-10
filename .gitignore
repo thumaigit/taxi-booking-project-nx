@@ -10,7 +10,11 @@
 
 # build
 /apps/web-portal/.next
+/apps/driver-app/.next
+
+#database
 /apps/user-service/prisma/dev.db
+/apps/user-service/prisma/dev.db-journal
 
 # prisma generated files
 **/generated

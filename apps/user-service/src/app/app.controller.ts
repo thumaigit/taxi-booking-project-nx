@@ -28,7 +28,7 @@ export class AppController {
   }
 
   @Post('user')
-  createUser(@Body() dto: User) {
+  createUser(@Body() dto: any) {
     return this.appService.createUser(dto);
   }
 
