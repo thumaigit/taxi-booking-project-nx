@@ -68,7 +68,7 @@ export function Login(props: LoginProps) {
             <label>
               <input
                 placeholder="Password"
-                type="text"
+                type="password"
                 name="password"
                 value={inputs?.password || ''}
                 onChange={handleChange}

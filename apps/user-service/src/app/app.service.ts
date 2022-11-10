@@ -6,10 +6,12 @@ import Axios from 'axios';
 const prisma = new PrismaClient();
 const goongKey = '0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG';
 const goong = 'https://rsapi.goong.io';
+
 const enum Status {
   ONLINE = 'ONLINE',
   OFFLINE = 'OFFLINE',
 }
+
 const enum UserType {
   CUSTOMER = 'customer',
   DRIVER = 'driver',
