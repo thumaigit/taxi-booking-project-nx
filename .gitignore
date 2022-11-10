@@ -10,6 +10,7 @@
 
 # build
 /apps/web-portal/.next
+/apps/user-service/prisma/dev.db
 
 # prisma generated files
 **/generated
@@ -46,3 +47,4 @@ testem.log
 # System Files
 .DS_Store
 Thumbs.db
+
