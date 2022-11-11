@@ -1,7 +1,8 @@
-import React, { ChangeEvent, useCallback, useEffect } from 'react';
-import { useState } from 'react';
-import styles from './index.module.css';
-import ReactMapGL from '@goongmaps/goong-map-react';
+import React, { ChangeEvent, useCallback, useContext, useEffect } from "react";
+import { useState } from "react";
+import styles from "./index.module.css";
+import ReactMapGL from "@goongmaps/goong-map-react";
+import { WebsocketContext } from "@@contexts/WebsocketContext";
 
 /* eslint-disable-next-line */
 export interface CallCenterProps {}
@@ -33,22 +34,24 @@ export interface PostRide {
 }
 
 const renderUser = {
-  fullName: '',
-  phoneNumber: '',
-  currentArriveAddress: '',
-  currentPickupAddress: '',
-  currentCarType: '4 seats',
-  currentPayment: 'cash',
+  fullName: "",
+  phoneNumber: "",
+  currentArriveAddress: "",
+  currentPickupAddress: "",
+  currentCarType: "4 seats",
+  currentPayment: "cash",
   rideHistory: [],
-  frequentlyAddress: [{ arrive_address: '' }],
+  frequentlyAddress: [{ arrive_address: "" }],
 };
 
 export function CallCenter(props: CallCenterProps) {
-  const [token, setToken] = useState('');
+  const socket = useContext(WebsocketContext);
+  const [appointmentId, setAppointmentId] = useState(null);
+  const [token, setToken] = useState("");
   const [inputs, setInputs] = useState<User>(renderUser);
-  const GOONG_MAPTILES_KEY = 'qlG01cOG4q7MHDCzbpn7vA6GvKHs06W4lZlq3PLl';
-  const MAP_API_KEY = '0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG';
-  const adminId = 'cl9chgyyq0000m1a6xoyu6rsb';
+  const GOONG_MAPTILES_KEY = "qlG01cOG4q7MHDCzbpn7vA6GvKHs06W4lZlq3PLl";
+  const MAP_API_KEY = "0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG";
+  const adminId = "cl9chgyyq0000m1a6xoyu6rsb";
   const [userId, setUserId] = useState(adminId);
   const [viewport, setViewport] = useState({
     width: 400,
@@ -89,10 +92,10 @@ export function CallCenter(props: CallCenterProps) {
     };
 
     const reponse = await fetch(`http://localhost:3000/api/ride`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(currentRide),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization: `Bearer ${token}`,
       },
     });
@@ -108,9 +111,9 @@ export function CallCenter(props: CallCenterProps) {
     const reponse = await fetch(
       `http://localhost:3000/api/${pickupAddress}/assign`,
       {
-        method: 'GET',
+        method: "GET",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
           Authorization: `Bearer ${token}`,
         },
       }
@@ -122,8 +125,8 @@ export function CallCenter(props: CallCenterProps) {
       });
 
       console.log(drivers);
-      
-      drivers.forEach(driver => {
+
+      drivers.forEach((driver) => {
         sentNotification(driver.driver_firebase_token);
       });
     }
@@ -132,19 +135,19 @@ export function CallCenter(props: CallCenterProps) {
   const sentNotification = async (driver: string) => {
     const notificationBody = {
       to: `${driver}`,
-      priority: 'high',
+      priority: "high",
       notification: {
-        body: 'Got Ride!',
+        body: "Got Ride!",
       },
     };
 
     const reponse = await fetch(`https://fcm.googleapis.com/fcm/send`, {
-      method: 'POST',
+      method: "POST",
       body: JSON.stringify(notificationBody),
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
         Authorization:
-          'key=AAAAFQ7SrF0:APA91bGQ5VhXQCBMndX_4uytFVycZzuZ641kCjNg7IJCjLA7x9RUmprDAvQZomRLrZzhuQawy2o-HaT3h2yxaySpgPnDUF1FdWMrsVKoDuMKlThlM9LG6IxI96MnEDY9j5xP0gsdL3NQ',
+          "key=AAAAFQ7SrF0:APA91bGQ5VhXQCBMndX_4uytFVycZzuZ641kCjNg7IJCjLA7x9RUmprDAvQZomRLrZzhuQawy2o-HaT3h2yxaySpgPnDUF1FdWMrsVKoDuMKlThlM9LG6IxI96MnEDY9j5xP0gsdL3NQ",
       },
     });
     console.log(driver);
@@ -176,7 +179,7 @@ export function CallCenter(props: CallCenterProps) {
   };
 
   const onSearchMap = async () => {
-    const goongHost = 'https://rsapi.goong.io';
+    const goongHost = "https://rsapi.goong.io";
     const apiKey = `api_key=${MAP_API_KEY}`;
     const arriveAddParams = `geocode?address=${inputs.currentArriveAddress}`;
     const pickupAddParams = `geocode?address=${inputs.currentPickupAddress}`;
@@ -199,12 +202,12 @@ export function CallCenter(props: CallCenterProps) {
   };
 
   const handleCallAccept = () => {
-    setInputs((input) => ({ ...input, phoneNumber: '01231231238' }));
+    setInputs((input) => ({ ...input, phoneNumber: "01231231238" }));
   };
 
   const handleLogout = () => {
-    localStorage.setItem('token', '');
-    window.location.href = '/';
+    localStorage.setItem("token", "");
+    window.location.href = "/";
   };
 
   useEffect(() => {
@@ -235,35 +238,55 @@ export function CallCenter(props: CallCenterProps) {
   }, [inputs.phoneNumber, token, userId]);
 
   useEffect(() => {
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem("token");
     setToken(token);
   }, []);
 
+  useEffect(() => {
+    socket.on("newAppointment", (payload) => {
+      console.log(payload);
+      setAppointmentId(payload?.id);
+    });
+
+    socket.on("acceptAppointment", (payload) => {
+      console.log(payload);
+    });
+
+    return () => {
+      socket.off("newAppointment");
+      socket.off("acceptAppointment");
+    };
+  }, []);
+
+  const onJoinRoom = () => {
+    socket.emit("JOIN_ROOM")
+  }
+
   return (
     <>
-      <div className={styles['wrapper']}>
-        <div className={styles['container']}>
-          <div className={styles['title']}>
+      <div className={styles["wrapper"]}>
+        <div className={styles["container"]}>
+          <div className={styles["title"]}>
             <h1>Booking Now</h1>
           </div>
-          <div className={styles['text-container']}>
+          <div className={styles["text-container"]}>
             <span>Customer is calling...</span>
             <button onClick={handleCallAccept}>Accept</button>
           </div>
-          <div className={styles['text-container']}>
+          <div className={styles["text-container"]}>
             <button onClick={handleLogout}>Logout</button>
           </div>
-          <div className={styles['card']}>
-            <form onSubmit={handleSubmit} className={styles['form']}>
-              <div className={styles['text-container']}>
-                <div className={styles['layer']}>
+          <div className={styles["card"]}>
+            <form onSubmit={handleSubmit} className={styles["form"]}>
+              <div className={styles["text-container"]}>
+                <div className={styles["layer"]}>
                   <h4>User Details</h4>
                   <label>
                     <input
                       placeholder="Fullname"
                       type="text"
                       name="fullName"
-                      value={inputs?.fullName || ''}
+                      value={inputs?.fullName || ""}
                       onChange={handleChange}
                       required
                     />
@@ -273,14 +296,14 @@ export function CallCenter(props: CallCenterProps) {
                       placeholder="Phone number"
                       type="text"
                       name="phoneNumber"
-                      value={inputs?.phoneNumber || ''}
+                      value={inputs?.phoneNumber || ""}
                       onChange={handleNumberChange}
                       required
                     />
                   </label>
                   <label>
                     <h5>Top 5 latest calls</h5>
-                    <table className={styles['history-table']}>
+                    <table className={styles["history-table"]}>
                       <thead>
                         <tr>
                           <th>Arrive Add.</th>
@@ -305,7 +328,7 @@ export function CallCenter(props: CallCenterProps) {
                   </label>
                   <label>
                     <h5>Top 5 frequently arrive address</h5>
-                    <table className={styles['history-table']}>
+                    <table className={styles["history-table"]}>
                       <thead>
                         <tr>
                           <th>Arrive Add.</th>
@@ -333,14 +356,14 @@ export function CallCenter(props: CallCenterProps) {
                     </table>
                   </label>
                 </div>
-                <div className={styles['layer']}>
+                <div className={styles["layer"]}>
                   <h4>Address Details</h4>
                   <label>
                     <input
                       placeholder="Arrive Address"
                       type="text"
                       name="currentArriveAddress"
-                      value={inputs?.currentArriveAddress || ''}
+                      value={inputs?.currentArriveAddress || ""}
                       onChange={handleChange}
                       required
                     />
@@ -350,7 +373,7 @@ export function CallCenter(props: CallCenterProps) {
                       placeholder="Pickup Address"
                       type="text"
                       name="currentPickupAddress"
-                      value={inputs?.currentPickupAddress || ''}
+                      value={inputs?.currentPickupAddress || ""}
                       onChange={handleChange}
                       required
                     />
@@ -358,10 +381,10 @@ export function CallCenter(props: CallCenterProps) {
                   </label>
                   <label>
                     <h5>Map</h5>
-                    <div className={styles['map-container']}></div>
+                    <div className={styles["map-container"]}></div>
                   </label>
                 </div>
-                <div className={styles['layer']}>
+                <div className={styles["layer"]}>
                   <h4>Ride Details</h4>
                   <label>
                     <h5>Car Type</h5>
@@ -389,14 +412,15 @@ export function CallCenter(props: CallCenterProps) {
                     </select>
                   </label>
                 </div>
-                <div className={styles['align-right']}>
-                  <input type="submit" value={'Book Ride'} />
+                <div className={styles["align-right"]}>
+                  <input type="submit" value={"Book Ride"} />
                 </div>
               </div>
             </form>
           </div>
         </div>
       </div>
+      <button onClick={onJoinRoom}>JOIN ROOM</button>
     </>
   );
 }
