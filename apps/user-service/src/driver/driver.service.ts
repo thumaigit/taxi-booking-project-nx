@@ -25,7 +25,7 @@ export class DriverService {
     }
   }
 
-  async findDriverForAppointment(clientLocation) {
+  async findDriverForAppointment(address: string) {
     try {
       const drivers = await prisma.driver.findMany({
         where: {
@@ -34,6 +34,8 @@ export class DriverService {
       });
 
       const response = drivers.map(async (driver) => {
+        const clientLocation = await this.goongService.getLocation(address);
+
         const driverLocation = await this.goongService.getLocation(
           driver.currentAddress
         );

@@ -34,20 +34,21 @@ export class NotificationGateway
 
   // Dispatcher action
   @SubscribeMessage("NEW_APPOINTMENT")
-  async newAppointment(driver: Socket, payload) {
-    const { id, startLocation } = payload;
+  async newAppointment(driver: Socket, appointment) {
+    const { id, startPoint } = appointment;
     driver.join(`appointment-${id}`);
 
+    console.log(appointment);
     const drivers = await this.driverService.findDriverForAppointment(
-      startLocation
+      startPoint
     );
-
+    console.log(drivers[0])
     drivers.forEach((value) => {
       const { id, direction } = value;
       driver.join(`driver-${id}`);
       driver.broadcast
         .to(`driver-${id}`)
-        .emit("newAppointment", { ...payload, direction });
+        .emit("newAppointment", { ...appointment, direction });
     });
   }
 
@@ -61,8 +62,8 @@ export class NotificationGateway
   // Driver action
   @SubscribeMessage("ACCEPT_APPOINTMENT")
   async handleAccept(driver: Socket, payload) {
-    const appointmentId = payload.appointment.id
-    console.log(payload)
+    const appointmentId = payload.appointment.id;
+    console.log(payload);
     driver.join(`appointment-${appointmentId}`);
     driver.broadcast
       .to(`appointment-${appointmentId}`)
