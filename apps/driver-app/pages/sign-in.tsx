@@ -20,43 +20,43 @@ const SignIn = () => {
     });
   };
   return (
-    <div className="wrapper">
-      <div className="card">
-        <form>
-          <h2 className="title">Car Booking</h2>
+    <div className="card">
+      <form>
+        <h2 className="title">Car Booking</h2>
 
-          <div className="email-login">
-            <label htmlFor="username">Tài khoản</label>
-            <input
-              value={form.username}
-              type="text"
-              name="username"
-              onChange={updateField}
-              required
-            />
-            <label htmlFor="password">Mật khẩu</label>
-            <input
-              value={form.password}
-              type="password"
-              name="password"
-              onChange={updateField}
-              required
-            />
-            <label htmlFor="phone">Số điện thoại</label>
-            <input
-              value={form.phone}
-              type="text"
-              name="phone"
-              onChange={updateField}
-              required
-            />
-          </div>
-          <button onClick={onSubmit} className="cta-btn">Đăng ký</button>
-          <Link className="forget-pass" href="/sign-up">
-            <a className="forget-pass">Đã có tài khoản? Đăng nhập</a>
-          </Link>
-        </form>
-      </div>
+        <div className="email-login">
+          <label htmlFor="username">Tài khoản</label>
+          <input
+            value={form.username}
+            type="text"
+            name="username"
+            onChange={updateField}
+            required
+          />
+          <label htmlFor="password">Mật khẩu</label>
+          <input
+            value={form.password}
+            type="password"
+            name="password"
+            onChange={updateField}
+            required
+          />
+          <label htmlFor="phone">Số điện thoại</label>
+          <input
+            value={form.phone}
+            type="text"
+            name="phone"
+            onChange={updateField}
+            required
+          />
+        </div>
+        <button onClick={onSubmit} className="cta-btn">
+          Đăng ký
+        </button>
+        <Link className="forget-pass" href="/sign-up">
+          <a className="forget-pass">Đã có tài khoản? Đăng nhập</a>
+        </Link>
+      </form>
     </div>
   );
 };
