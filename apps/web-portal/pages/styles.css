@@ -1,3 +1,5 @@
+@import url("https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap");
+
 html {
   -webkit-text-size-adjust: 100%;
   font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont,
@@ -7,10 +9,12 @@ html {
   tab-size: 4;
   scroll-behavior: smooth;
 }
-body {
-  font-family: inherit;
+body * {
+  font-family: "Montserrat";
   line-height: inherit;
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
 }
 h1,
 h2,
@@ -407,4 +411,68 @@ summary svg {
   #middle-content {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
+}
+
+.wrapper {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 100%;
+}
+
+.card {
+  padding: 10px;
+}
+
+.title {
+  text-align: center;
+  font-weight: bold;
+  margin: 0;
+  font-size: 25px;
+  margin-bottom: 20px;
+}
+
+.btn-text {
+  margin: 0;
+}
+
+.email-login {
+  display: flex;
+  flex-direction: column;
+}
+.email-login label {
+  color: rgb(108, 108, 108);
+  font-size: 15px;
+  font-weight: 600;
+}
+
+.email-login input:focus {
+  outline: 1px solid #ccc;
+}
+
+.cta-btn {
+  background-color: rgb(69, 69, 185);
+  color: white;
+  padding: 18px 20px;
+  margin-top: 10px;
+  margin-bottom: 20px;
+  width: 100%;
+  border-radius: 10px;
+  border: none;
+  cursor: pointer;
+  font-weight: 600;
+}
+
+.forget-pass {
+  float: right;
+  font-size: 14px !important;
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+  font-weight: 500;
+}
+
+.avatar {
+  width: 70px;
+  height: 70px;
+  border-radius: 10px;
 }

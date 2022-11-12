@@ -16,9 +16,13 @@ const Dashboard = () => {
   const appointmentInit = {
     id: "678",
     name: "Mai Thị Hằng Thư",
-    phone: "0987 654 321",
+    phone: "0987654321",
     startPoint:
       "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
+    startLocation: {
+      lat: 10.8362668,
+      lng: 106.8083887,
+    },
     endPoint:
       "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
   };
@@ -26,8 +30,6 @@ const Dashboard = () => {
   const socket = useContext(WebsocketContext);
   const driver = useSelector((state: AppState) => state.app.driver);
   const [appointment, setAppointment] = useState(null);
-  const [open, setOpen] = React.useState(false);
-  const [show, setShow] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
 
   const handleToggleStatus = () => {
@@ -35,9 +37,8 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    socket.on("newAppointment", (message) => {
-      console.log(message);
-      setAppointment(message.payload);
+    socket.on("newAppointment", (payload) => {
+      setAppointment(payload);
     });
 
     socket.on("acceptAppointment", (payload) => {
@@ -53,13 +54,15 @@ const Dashboard = () => {
   useEffect(() => {
     if (isOnline) {
       socket.emit("DRIVER_READY", driver);
+    } else {
+      socket.emit("DRIVER_OFFLINE");
     }
   }, [isOnline]);
 
   const onAccept = () => {
     socket.emit("ACCEPT_APPOINTMENT", {
-      room_id: "car:567",
       driver,
+      appointment,
     });
   };
 

@@ -1,7 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { GoongService } from "../goong/goong.service";
-import { createDriverDto } from "./dto/createDriver.dto";
 import { signInDto } from "./dto/signIn.dto";
 
 const prisma = new PrismaClient();
@@ -45,12 +44,20 @@ export class DriverService {
         );
 
         if (direction.distance.value < 2000) {
-          return driver.id;
-        } 
-        return
+          return {
+            id: driver.id,
+            direction: {
+              distance: direction.direction,
+              duration: direction.duration,
+            },
+          };
+        }
+        return;
       });
 
-      return Promise.all(response);
+      return Promise.all(response).then((results) => {
+        return results.filter((driver) => driver?.id != undefined);
+      });
     } catch (error) {
       console.log(error);
     }

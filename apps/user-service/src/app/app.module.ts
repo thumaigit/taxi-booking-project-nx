@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+import { AppointmentModule } from "../appointment/appointment.module";
 import { DriverModule } from "../driver/driver.module";
 import { GoongModule } from "../goong/goong.module";
 import { NotificationModule } from "../notification/notification.module";
@@ -12,6 +13,7 @@ import { UserJwtStrategy } from "./jwt.strategy";
   imports: [
     NotificationModule,
     DriverModule,
+    AppointmentModule,
     GoongModule,
     PassportModule,
     JwtModule.register({

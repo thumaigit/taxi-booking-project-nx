@@ -1,9 +1,7 @@
 import { Injectable } from "@nestjs/common";
-import { PrismaClient } from "@prisma/client";
 import Axios from "axios";
 
-const prisma = new PrismaClient();
-const goongKey = "0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG";
+const goongKey = "nfDk3FDdQtt1H7u2xBoK3cFou0usd0rMmLnJ3AzJ";
 const goong = "https://rsapi.goong.io";
 
 @Injectable()

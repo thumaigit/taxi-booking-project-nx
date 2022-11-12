@@ -60,15 +60,30 @@ model Client {
 }
 
 model Driver {
-  id             String   @id @default(cuid())
+  id             String        @id @default(cuid())
   name           String
-  phone          String   @unique
+  phone          String        @unique
   password       String
-  status         String   @default("OFFLINE")
+  status         String        @default("OFFLINE")
   carName        String
   carType        String?
   carLicense     String
   currentAddress String
-  createdAt      DateTime @default(now())
-  updatedAt      DateTime @updatedAt
+  createdAt      DateTime      @default(now())
+  updatedAt      DateTime      @updatedAt
+  history        Appointment[]
+}
+
+model Appointment {
+  id            Int      @id @default(autoincrement())
+  clientName    String
+  clientPhone   String
+  startPoint    String
+  startLocation String?
+  endPoint      String
+  endLocation   String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  Driver        Driver?  @relation(fields: [driverId], references: [id])
+  driverId      String?
 }
