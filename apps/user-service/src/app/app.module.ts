@@ -7,6 +7,7 @@ import { NotificationModule } from "../notification/notification.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UserJwtStrategy } from "./jwt.strategy";
+import { TwilioModule } from 'nestjs-twilio';
 
 @Module({
   imports: [
@@ -17,6 +18,10 @@ import { UserJwtStrategy } from "./jwt.strategy";
     JwtModule.register({
       secret: process.env.JWT_CONSTANTS_SECRET,
       signOptions: { expiresIn: "3000s" },
+    }),
+    TwilioModule.forRoot({
+      accountSid: process.env.TWILIO_ACCOUNT_SID,
+      authToken: process.env.TWILIO_AUTH_TOKEN,
     }),
   ],
   controllers: [AppController],
