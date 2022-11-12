@@ -16,11 +16,6 @@ import { AppService } from './app.service';
 export class AppController {
   constructor(private readonly appService: AppService) {}
 
-  @Get()
-  getData() {
-    return this.appService.getData();
-  }
-
   @Get(':phone_number/login')
   getLoginUserByPhoneNumber(@Param('phone_number') phone_number: string) {
     const res = this.appService.findLoginUser(phone_number);
@@ -77,4 +72,14 @@ export class AppController {
     const drivers = this.appService.getAvailableDriver(customer_address);
     return drivers;
   }
+
+  @UseGuards(AuthGuard('jwt'))
+  @Get(':customer_phone/sms')
+  sentSmsCustomer(
+    @Param('customer_phone') customer_phone: string
+  ): Promise<any> {
+    const result = this.appService.sendSMS(customer_phone);
+    return result;
+  }
+
 }

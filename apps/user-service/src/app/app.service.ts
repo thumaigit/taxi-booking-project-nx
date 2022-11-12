@@ -2,6 +2,7 @@ import { Injectable } from '@nestjs/common';
 import { Prisma, PrismaClient, Ride, User } from '@prisma/client';
 import * as bcrypt from 'bcrypt';
 import Axios from 'axios';
+import { TwilioService } from 'nestjs-twilio';
 
 const prisma = new PrismaClient();
 const goongKey = '0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG';
@@ -37,9 +38,7 @@ export type CreateUserResponse = Omit<User, 'user_password'>;
 
 @Injectable()
 export class AppService {
-  getData(): { message: string } {
-    return { message: 'Welcome to user-service!' };
-  }
+  public constructor(private readonly twilioService: TwilioService) {}
 
   async getUser(phoneNumber: string): Promise<CallUser> {
     const user = await prisma.user.findUnique({
@@ -225,5 +224,13 @@ export class AppService {
     } catch (error) {
       console.error('getAvailableDriver error');
     }
+  }
+
+  async sendSMS(customer_phone: string) {
+    return this.twilioService.client.messages.create({
+      body: 'SMS Body, sent to the phone!',
+      from: process.env.TWILIO_PHONE_NUMBER,
+      to: customer_phone,
+    });
   }
 }
