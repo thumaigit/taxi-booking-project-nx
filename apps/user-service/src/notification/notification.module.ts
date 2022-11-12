@@ -1,9 +1,9 @@
 import { Module } from "@nestjs/common";
-import { DriverOnlineService } from "./driverOnline/driverOnline.service";
+import { DriverService } from "../driver/driver.service";
 import { NotificationGateway } from "./notification.gateway";
 
 @Module({
-  providers: [NotificationGateway, DriverOnlineService],
+  providers: [NotificationGateway, DriverService],
   exports: [NotificationGateway],
 })
 export class NotificationModule {}

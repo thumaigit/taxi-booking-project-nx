@@ -6,7 +6,7 @@ import {
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
-import { DriverOnlineService } from "./driverOnline/driverOnline.service";
+import { DriverService } from "../driver/driver.service";
 
 @WebSocketGateway({ cors: true })
 export class NotificationGateway
@@ -14,11 +14,10 @@ export class NotificationGateway
 {
   @WebSocketServer() server: Server;
 
-  constructor(private driverOnlineService: DriverOnlineService) {}
+  constructor(private driverService: DriverService) {}
 
   async handleConnection(socket: Socket) {
     console.log("Connected");
-    console.log(socket.rooms); // Set { <socket.id>, "room1" }
   }
 
   async handleDisconnect(socket: Socket) {
@@ -36,9 +35,16 @@ export class NotificationGateway
   // Dispatcher action
   @SubscribeMessage("NEW_APPOINTMENT")
   async newAppointment(driver: Socket, payload) {
-    const room_id = "car:567";
-    driver.join(room_id);
-    driver.broadcast.emit("newAppointment", { payload, room_id: room_id });
+    const { startLocation } = payload;
+    const drivers = await this.driverService.findDriverForAppointment(startLocation);
+    console.log(`Ahuhuhu: ${drivers}`)
+
+    drivers.forEach((driverId) => {
+      driver.join(`driver-${driverId}`);
+      driver.broadcast
+        .to(`driver-${driverId}`)
+        .emit("newAppointment", { payload });
+    });
   }
 
   @SubscribeMessage("ASSIGN_APPOINTMENT")
@@ -75,8 +81,7 @@ export class NotificationGateway
 
   @SubscribeMessage("DRIVER_READY")
   async handleReady(driver: Socket, payload) {
-    this.driverOnlineService.addDriver(payload);
-    driver.join(`driver-${payload.driver_id}`);
+    driver.join(`driver-${payload.id}`);
     driver.join("driversReady");
     driver.emit("driversReady", { payload });
   }
@@ -89,7 +94,7 @@ export class NotificationGateway
 
   @SubscribeMessage("DRIVER_OFFLINE")
   async handleOffline(driver: Socket, id) {
-    this.driverOnlineService.removeDriver(id);
+    // this.driverOnlineService.removeDriver(id);
     driver.disconnect();
   }
 }

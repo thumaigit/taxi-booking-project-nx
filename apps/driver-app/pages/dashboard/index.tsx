@@ -10,6 +10,7 @@ import { Box, Button, Typography } from "@mui/material";
 import Switch from "@mui/material/Switch";
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
+import { formatPhoneNumber } from "@@common/formatPhoneNumber";
 
 const Dashboard = () => {
   const appointmentInit = {
@@ -50,7 +51,9 @@ const Dashboard = () => {
   }, []);
 
   useEffect(() => {
-    console.log(isOnline);
+    if (isOnline) {
+      socket.emit("DRIVER_READY", driver);
+    }
   }, [isOnline]);
 
   const onAccept = () => {
@@ -160,7 +163,7 @@ const Dashboard = () => {
                       fontFamily: "Montserrat",
                     }}
                   >
-                    0987 654 321
+                    {formatPhoneNumber(driver?.phone)}
                   </Typography>
                 </Box>
 
@@ -282,7 +285,7 @@ const Dashboard = () => {
                   color: "#FF7F00",
                 }}
               >
-                {appointment?.phone}
+                {formatPhoneNumber(appointment?.phone)}
               </Typography>
             </Box>
           </Box>
