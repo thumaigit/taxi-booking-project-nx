@@ -1,6 +1,7 @@
 import { Module } from "@nestjs/common";
 import { JwtModule } from "@nestjs/jwt";
 import { PassportModule } from "@nestjs/passport";
+import { DriverModule } from "../driver/driver.module";
 import { NotificationModule } from "../notification/notification.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
@@ -9,6 +10,7 @@ import { UserJwtStrategy } from "./jwt.strategy";
 @Module({
   imports: [
     NotificationModule,
+    DriverModule,
     PassportModule,
     JwtModule.register({
       secret: process.env.JWT_CONSTANTS_SECRET,

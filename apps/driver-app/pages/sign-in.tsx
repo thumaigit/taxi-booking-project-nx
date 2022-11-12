@@ -1,16 +1,23 @@
+import { useSignInMutation } from "@@store/api";
+import { setDriver } from "@@store/appSlice";
 import Link from "next/link";
-import React, { useState } from "react";
+import { useRouter } from "next/router";
+import React, { useEffect, useState } from "react";
+import { useDispatch } from "react-redux";
 
 const SignIn = () => {
+  const router = useRouter();
+  const dispatch = useDispatch();
+  const [signIn, { isError, isSuccess, data, error }] = useSignInMutation();
+
   const [form, setValues] = useState({
-    username: "",
-    password: "",
     phone: "",
+    password: "",
   });
 
   const onSubmit = (e) => {
     e.preventDefault();
-    console.log(JSON.stringify(form, null, 2));
+    signIn(form);
   };
 
   const updateField = (e) => {
@@ -19,17 +26,25 @@ const SignIn = () => {
       [e.target.name]: e.target.value,
     });
   };
+
+  useEffect(() => {
+    if (isSuccess) {
+      dispatch(setDriver(data));
+      router.push("/dashboard");
+    }
+  }, [isSuccess]);
+
   return (
     <div className="card">
       <form>
         <h2 className="title">Car Booking</h2>
 
         <div className="email-login">
-          <label htmlFor="username">Tài khoản</label>
+          <label htmlFor="phone">Số điện thoại</label>
           <input
-            value={form.username}
+            value={form.phone}
             type="text"
-            name="username"
+            name="phone"
             onChange={updateField}
             required
           />
@@ -41,20 +56,12 @@ const SignIn = () => {
             onChange={updateField}
             required
           />
-          <label htmlFor="phone">Số điện thoại</label>
-          <input
-            value={form.phone}
-            type="text"
-            name="phone"
-            onChange={updateField}
-            required
-          />
         </div>
         <button onClick={onSubmit} className="cta-btn">
-          Đăng ký
+          Đăng nhập
         </button>
         <Link className="forget-pass" href="/sign-up">
-          <a className="forget-pass">Đã có tài khoản? Đăng nhập</a>
+          <a className="forget-pass">Chưa có tài khoản? Đăng ký</a>
         </Link>
       </form>
     </div>

@@ -1,22 +1,15 @@
 import { WebsocketContext } from "@@contexts/WebsocketContext";
 import { AppState } from "@@store/store";
+import AdjustIcon from "@mui/icons-material/Adjust";
+import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import MenuIcon from "@mui/icons-material/Menu";
-import { Box, Button, Slide, Typography } from "@mui/material";
+import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
+import ToysOutlinedIcon from "@mui/icons-material/ToysOutlined";
+import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
+import { Box, Button, Typography } from "@mui/material";
 import Switch from "@mui/material/Switch";
-import { TransitionProps } from "@mui/material/transitions";
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
-import FmdGoodIcon from "@mui/icons-material/FmdGood";
-import AdjustIcon from "@mui/icons-material/Adjust";
-
-const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
-  ref: React.Ref<unknown>
-) {
-  return <Slide direction="up" ref={ref} {...props} />;
-});
 
 const Dashboard = () => {
   const appointmentInit = {
@@ -31,18 +24,10 @@ const Dashboard = () => {
 
   const socket = useContext(WebsocketContext);
   const driver = useSelector((state: AppState) => state.app.driver);
-  const [appointment, setAppointment] = useState(appointmentInit);
+  const [appointment, setAppointment] = useState(null);
   const [open, setOpen] = React.useState(false);
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   const [isOnline, setIsOnline] = useState(true);
-
-  const handleClickOpen = () => {
-    setOpen(true);
-  };
-
-  const handleClose = () => {
-    setOpen(false);
-  };
 
   const handleToggleStatus = () => {
     setIsOnline(!isOnline);
@@ -71,23 +56,16 @@ const Dashboard = () => {
   const onAccept = () => {
     socket.emit("ACCEPT_APPOINTMENT", {
       room_id: "car:567",
-      driver: {
-        name: "Thu Mai",
-        carType: "7 chỗ",
-        address: "3 Võ Chí Công - TP. Thủ Đức",
-      },
+      driver,
     });
   };
 
   const onReject = () => {
-    socket.emit("REJECT_APPOINTMENT", {
-      room_id: "car:567",
-      driver: {
-        name: "Thu Mai",
-        carType: "7 chỗ",
-        address: "3 Võ Chí Công - TP. Thủ Đức",
-      },
-    });
+    setAppointment(null);
+    // socket.emit("REJECT_APPOINTMENT", {
+    //   room_id: "car:567",
+    //   driver,
+    // });
   };
 
   return (
@@ -122,7 +100,7 @@ const Dashboard = () => {
             fontFamily: "Montserrat",
           }}
         >
-          Online
+          {isOnline ? "Online" : "Offline"}
         </Typography>
         <Switch
           onChange={handleToggleStatus}
@@ -133,8 +111,132 @@ const Dashboard = () => {
         />
       </Box>
 
+      <Box sx={{ flex: 1, marginTop: "20px" }}>
+        <Box
+          sx={{
+            background: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            padding: "10px",
+            color: "#00155F",
+            borderRadius: "10px",
+            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+          }}
+        >
+          <Box sx={{ display: "flex" }}>
+            <img className="avatar" src="imgs/avatar-men.png" alt="" />
+            <Box
+              sx={{
+                marginLeft: "20px",
+                display: "flex",
+                flexDirection: "column",
+              }}
+            >
+              <Typography
+                sx={{
+                  fontSize: "18px",
+                  fontWeight: 600,
+                  marginBottom: "10px",
+                  fontFamily: "Montserrat",
+                }}
+              >
+                {driver?.name}
+              </Typography>
+              <Box>
+                <Box
+                  sx={{
+                    display: "flex",
+                    color: "#FF7F00",
+                  }}
+                >
+                  <LocalPhoneOutlinedIcon sx={{ fontSize: "20px" }} />
+                  <Typography
+                    sx={{
+                      marginLeft: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      fontFamily: "Montserrat",
+                    }}
+                  >
+                    0987 654 321
+                  </Typography>
+                </Box>
+
+                <Box
+                  sx={{
+                    display: "flex",
+                    color: "#FF7F00",
+                  }}
+                >
+                  <ToysOutlinedIcon sx={{ fontSize: "20px" }} />
+                  <Typography
+                    sx={{
+                      marginLeft: "10px",
+                      fontSize: "14px",
+                      fontWeight: 500,
+                      fontFamily: "Montserrat",
+                    }}
+                  >
+                    {driver?.carLicense} | {driver?.carType}
+                  </Typography>
+                </Box>
+              </Box>
+            </Box>
+          </Box>
+        </Box>
+        <Box
+          sx={{
+            background: "#fff",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "space-between",
+            width: "100%",
+            padding: "10px",
+            borderRadius: "10px",
+            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+            marginTop: "20px",
+            color: "#00155F",
+          }}
+        >
+          <Box>
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "10px",
+              }}
+            >
+              <FmdGoodOutlinedIcon />
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  marginLeft: "10px",
+                  fontFamily: "Montserrat",
+                  color: "#777",
+                }}
+              >
+                Vị trí hiện tại:
+              </Typography>
+            </Box>
+            <Typography
+              sx={{
+                fontSize: "14px",
+                fontWeight: 500,
+                marginLeft: "10px",
+                fontFamily: "Montserrat",
+              }}
+            >
+              {driver?.currentAddress}
+            </Typography>
+          </Box>
+        </Box>
+      </Box>
+
       {/* Notification new apppoiment */}
-      {show && (
+      {!!appointment && (
         <Box
           sx={{
             background: "#fff",
@@ -270,6 +372,7 @@ const Dashboard = () => {
               }}
               variant="contained"
               color="error"
+              onClick={onReject}
             >
               Từ chối
             </Button>
@@ -280,6 +383,7 @@ const Dashboard = () => {
               }}
               variant="contained"
               color="success"
+              onClick={onAccept}
             >
               Nhận chuyến
             </Button>

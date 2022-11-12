@@ -6,6 +6,11 @@ const initialState = {
     id: null,
     name: null,
     phone: null,
+    status: null,
+    carName: null,
+    carType: null,
+    carLicense: null,
+    currentAddress: null,
   },
   authorized: false,
 };
@@ -33,5 +38,5 @@ export const appSlice = createSlice({
   },
 });
 
-export const { clearStore, setAuthorized } = appSlice.actions;
+export const { clearStore, setDriver, setAuthorized } = appSlice.actions;
 export default appSlice.reducer;

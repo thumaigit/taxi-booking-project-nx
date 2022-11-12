@@ -2,7 +2,7 @@
 import { createApi, fetchBaseQuery } from "@reduxjs/toolkit/query/react";
 
 export interface SignInBody {
-  username: string;
+  phone: string;
   password: string;
 }
 
@@ -15,7 +15,7 @@ export const userApi = createApi({
   endpoints: (builder) => ({
     signIn: builder.mutation({
       query: (body: SignInBody) => ({
-        url: "/sign-in",
+        url: "/driver/sign-in",
         method: "POST",
         body,
       }),

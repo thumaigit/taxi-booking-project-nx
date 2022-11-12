@@ -6,15 +6,18 @@ import {
 } from "@reduxjs/toolkit";
 import { persistReducer, persistStore } from "redux-persist";
 import storage from "redux-persist/lib/storage";
+import { userApi } from "./api";
 import { appSlice } from "./appSlice";
 
 const persistConfig = {
   key: "root",
   storage,
+  blacklist: [userApi.reducerPath],
 };
 
 const reducer = combineReducers({
   [appSlice.name]: appSlice.reducer,
+  [userApi.reducerPath]: userApi.reducer,
 });
 
 // this ensures your redux state is saved to persisted storage whenever it changes
@@ -26,7 +29,7 @@ const makeStore = () =>
     middleware: (getDefaultMiddleware) =>
       getDefaultMiddleware({
         serializableCheck: false,
-      }),
+      }).concat(userApi.middleware),
   });
 
 const reduxStore = () => {
