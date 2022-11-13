@@ -13,7 +13,7 @@ function CustomApp({ Component, pageProps }: AppProps) {
   return (
     <Provider store={store}>
       <Head>
-        <title>Welcome to Call Center</title>
+        <title>Call Center</title>
       </Head>
       <PersistGate loading={null} persistor={persistor}>
         <WebsocketProvider value={socket}>
