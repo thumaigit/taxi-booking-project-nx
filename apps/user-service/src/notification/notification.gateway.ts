@@ -7,6 +7,7 @@ import {
 } from "@nestjs/websockets";
 import { Server, Socket } from "socket.io";
 import { DriverService } from "../driver/driver.service";
+import { DriverToAppointmentService } from "../driverToAppointment/driverToAppointment.service";
 
 @WebSocketGateway({ cors: true })
 export class NotificationGateway
@@ -14,7 +15,10 @@ export class NotificationGateway
 {
   @WebSocketServer() server: Server;
 
-  constructor(private driverService: DriverService) {}
+  constructor(
+    private driverService: DriverService,
+    private driverToAppointmentService: DriverToAppointmentService
+  ) {}
 
   async handleConnection(socket: Socket) {
     console.log("Connected");
@@ -35,18 +39,23 @@ export class NotificationGateway
   // Dispatcher action
   @SubscribeMessage("NEW_APPOINTMENT")
   async newAppointment(driver: Socket, payload) {
-    const { id, startLocation } = payload;
-    driver.join(`appointment-${id}`);
+    const { id: appointmentId, startPoint } = payload;
+    driver.join(`appointment-${appointmentId}`);
 
     const drivers = await this.driverService.findDriverForAppointment(
-      startLocation
+      startPoint
     );
 
     drivers.forEach((value) => {
-      const { id, direction } = value;
-      driver.join(`driver-${id}`);
+      const { id: driverId, direction } = value;
+      this.driverToAppointmentService.create({
+        appointmentId,
+        driverId,
+        direction: JSON.stringify(direction),
+      });
+      driver.join(`driver-${driverId}`);
       driver.broadcast
-        .to(`driver-${id}`)
+        .to(`driver-${driverId}`)
         .emit("newAppointment", { ...payload, direction });
     });
   }
@@ -61,8 +70,16 @@ export class NotificationGateway
   // Driver action
   @SubscribeMessage("ACCEPT_APPOINTMENT")
   async handleAccept(driver: Socket, payload) {
-    const appointmentId = payload.appointment.id
-    console.log(payload)
+    const appointmentId = payload.appointment.id;
+    const driverId = payload.driver.id;
+
+    this.driverToAppointmentService.updateByInfo({
+      appointmentId,
+      driverId,
+      action: "ACCEPTED",
+    });
+
+    console.log(payload);
     driver.join(`appointment-${appointmentId}`);
     driver.broadcast
       .to(`appointment-${appointmentId}`)
@@ -71,11 +88,19 @@ export class NotificationGateway
 
   @SubscribeMessage("REJECT_APPOINTMENT")
   async handleReject(driver: Socket, payload) {
-    const room_id = payload.room_id;
-    driver.join(room_id);
+    const appointmentId = payload.appointment.id;
+    const driverId = payload.driver.id;
+
+    this.driverToAppointmentService.updateByInfo({
+      appointmentId,
+      driverId,
+      action: "REJECTED",
+    });
+
+    driver.join(`appointment-${appointmentId}`);
     driver.broadcast
-      .to(room_id)
-      .emit("rejectAppointment", { payload, action: "REJECTED" });
+      .to(`appointment-${appointmentId}`)
+      .emit("rejectAppointment", { ...payload, action: "REJECTED" });
   }
 
   @SubscribeMessage("CANCEL_APPOINTMENT")

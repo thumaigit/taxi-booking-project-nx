@@ -10,6 +10,14 @@ const prisma = new PrismaClient();
 export class AppointmentService {
   constructor(private readonly goongService: GoongService) {}
 
+  async findAll() {
+    try {
+      return await prisma.appointment.findMany();
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   async findByPhone(clientPhone: string) {
     try {
       return await prisma.appointment.findMany({

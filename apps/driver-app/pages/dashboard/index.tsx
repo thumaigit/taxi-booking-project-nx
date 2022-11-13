@@ -13,20 +13,6 @@ import { useSelector } from "react-redux";
 import { formatPhoneNumber } from "@@common/formatPhoneNumber";
 
 const Dashboard = () => {
-  const appointmentInit = {
-    id: "678",
-    name: "Mai Thị Hằng Thư",
-    phone: "0987654321",
-    startPoint:
-      "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
-    startLocation: {
-      lat: 10.8362668,
-      lng: 106.8083887,
-    },
-    endPoint:
-      "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
-  };
-
   const socket = useContext(WebsocketContext);
   const driver = useSelector((state: AppState) => state.app.driver);
   const [appointment, setAppointment] = useState(null);
@@ -68,10 +54,10 @@ const Dashboard = () => {
 
   const onReject = () => {
     setAppointment(null);
-    // socket.emit("REJECT_APPOINTMENT", {
-    //   room_id: "car:567",
-    //   driver,
-    // });
+    socket.emit("REJECT_APPOINTMENT", {
+      driver,
+      appointment,
+    });
   };
 
   return (
@@ -278,7 +264,7 @@ const Dashboard = () => {
                   fontFamily: "Montserrat",
                 }}
               >
-                {appointment?.name}
+                {appointment?.clientName}
               </Typography>
               <Typography
                 sx={{
@@ -288,7 +274,7 @@ const Dashboard = () => {
                   color: "#FF7F00",
                 }}
               >
-                {formatPhoneNumber(appointment?.phone)}
+                {formatPhoneNumber(appointment?.clientPhone)}
               </Typography>
             </Box>
           </Box>

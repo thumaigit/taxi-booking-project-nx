@@ -8,13 +8,15 @@ import { NotificationModule } from "../notification/notification.module";
 import { AppController } from "./app.controller";
 import { AppService } from "./app.service";
 import { UserJwtStrategy } from "./jwt.strategy";
-import { TwilioModule } from 'nestjs-twilio';
+import { TwilioModule } from "nestjs-twilio";
+import { DriverToAppointmentModule } from "../driverToAppointment/driverToAppointment.module";
 
 @Module({
   imports: [
     NotificationModule,
     DriverModule,
     AppointmentModule,
+    DriverToAppointmentModule,
     GoongModule,
     PassportModule,
     JwtModule.register({

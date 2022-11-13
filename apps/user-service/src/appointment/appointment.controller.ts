@@ -22,6 +22,10 @@ import { updateAppointmentDto } from "./dto/updateAppointment.dto";
 )
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
+  @Get("")
+  findAll() {
+    return this.appointmentService.findAll();
+  }
 
   @Post("")
   createAppointment(@Body() dto: createAppointmentDto) {

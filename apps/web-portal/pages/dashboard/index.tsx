@@ -1,24 +1,21 @@
 import { WebsocketContext } from "@@contexts/WebsocketContext";
+import { useCreateAppointmentMutation } from "@@store/api";
 import { Box, Button, TextField, Typography } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
 
 const Dashboard = () => {
   const socket = useContext(WebsocketContext);
   const appointmentInit = {
-    id: "678",
-    name: "Mai Thị Hằng Thư",
-    phone: "0987654321",
+    clientName : "Mai Thị Hằng Thư",
+    clientPhone : "0987654321",
     startPoint:
       "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
-    startLocation: {
-      lat: 10.8362668,
-      lng: 106.8083887,
-    },
     endPoint:
       "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
   };
   const [drivers, setDrivers] = useState([]);
   const [driverAccept, setDriverAccept] = useState(null);
+  const [createAppointment, createResult] = useCreateAppointmentMutation();
 
   const [form, setValues] = useState({
     phone: "",
@@ -29,7 +26,7 @@ const Dashboard = () => {
 
   const onSubmit = (e) => {
     e.preventDefault();
-    socket.emit("NEW_APPOINTMENT", { ...appointmentInit });
+    createAppointment(appointmentInit);
   };
 
   const updateField = (e) => {
@@ -57,8 +54,10 @@ const Dashboard = () => {
   }, [driverAccept]);
 
   useEffect(() => {
-    console.log(drivers);
-  }, [drivers]);
+    if (createResult.isSuccess) {
+      socket.emit("NEW_APPOINTMENT", { ...createResult.data });
+    }
+  }, [createResult.isSuccess]);
 
   return (
     <Box sx={{ display: "flex" }}>

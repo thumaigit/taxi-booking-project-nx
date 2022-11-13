@@ -60,30 +60,46 @@ model Client {
 }
 
 model Driver {
-  id             String        @id @default(cuid())
-  name           String
-  phone          String        @unique
-  password       String
-  status         String        @default("OFFLINE")
-  carName        String
-  carType        String?
-  carLicense     String
-  currentAddress String
-  createdAt      DateTime      @default(now())
-  updatedAt      DateTime      @updatedAt
-  history        Appointment[]
+  id                  String                @id @default(cuid())
+  name                String
+  phone               String                @unique
+  password            String
+  status              String                @default("OFFLINE")
+  carName             String
+  carType             String?
+  carLicense          String
+  currentAddress      String
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  history             Appointment[]
+  driverToAppointment DriverToAppointment[]
 }
 
 model Appointment {
-  id            Int      @id @default(autoincrement())
-  clientName    String
-  clientPhone   String
-  startPoint    String
-  startLocation String?
-  endPoint      String
-  endLocation   String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  Driver        Driver?  @relation(fields: [driverId], references: [id])
-  driverId      String?
+  id                  Int                   @id @default(autoincrement())
+  clientName          String
+  clientPhone         String
+  startPoint          String
+  startLocation       String?
+  endPoint            String
+  endLocation         String?
+  createdAt           DateTime              @default(now())
+  updatedAt           DateTime              @updatedAt
+  driverAssigned      Driver?               @relation(fields: [driverId], references: [id])
+  driverId            String?
+  driverToAppointment DriverToAppointment[]
+}
+
+model DriverToAppointment {
+  id            Int         @id @default(autoincrement())
+  appointmentId Int
+  driverId      String
+  direction     String
+  action        String      @default("WAITING")
+  driver        Driver      @relation(fields: [driverId], references: [id])
+  appointment   Appointment @relation(fields: [appointmentId], references: [id])
+  createdAt     DateTime    @default(now())
+  updatedAt     DateTime    @updatedAt
+
+  @@unique([appointmentId, driverId])
 }
