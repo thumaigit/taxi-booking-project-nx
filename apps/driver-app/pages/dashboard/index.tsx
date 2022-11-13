@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { WebsocketContext } from "@@contexts/WebsocketContext";
 import { AppState } from "@@store/store";
 import AdjustIcon from "@mui/icons-material/Adjust";
@@ -11,12 +12,16 @@ import Switch from "@mui/material/Switch";
 import React, { useContext, useEffect, useState } from "react";
 import { useSelector } from "react-redux";
 import { formatPhoneNumber } from "@@common/formatPhoneNumber";
+import LinearProgress from "@mui/material/LinearProgress";
 
 const Dashboard = () => {
   const socket = useContext(WebsocketContext);
   const driver = useSelector((state: AppState) => state.app.driver);
-  const [appointment, setAppointment] = useState(null);
+  const [newAppointment, setNewAppointment] = useState(null);
+  const [appointmentAssigned, setAppointmentAsigned] = useState(null);
   const [isOnline, setIsOnline] = useState(true);
+  const [isWaiting, setIsWaiting] = useState(false);
+  const [isAlreadyAssign, setIsAlreadyAssign] = useState(false);
 
   const handleToggleStatus = () => {
     setIsOnline(!isOnline);
@@ -24,16 +29,22 @@ const Dashboard = () => {
 
   useEffect(() => {
     socket.on("newAppointment", (payload) => {
-      setAppointment(payload);
+      setNewAppointment(payload);
     });
 
-    socket.on("acceptAppointment", (payload) => {
-      console.log(payload);
+    socket.on("assignAppointment", (payload) => {
+      if (payload.driverId === driver.id) {
+        setAppointmentAsigned(payload);
+        setIsWaiting(false);
+      } else {
+        setIsWaiting(false);
+        setIsAlreadyAssign(true);
+      }
     });
 
     return () => {
       socket.off("newAppointment");
-      socket.off("acceptAppointment");
+      socket.off("assignAppointment");
     };
   }, []);
 
@@ -41,22 +52,32 @@ const Dashboard = () => {
     if (isOnline) {
       socket.emit("DRIVER_READY", driver);
     } else {
-      socket.emit("DRIVER_OFFLINE");
+      socket.emit("DRIVER_OFFLINE", driver);
     }
   }, [isOnline]);
 
-  const onAccept = () => {
-    socket.emit("ACCEPT_APPOINTMENT", {
+  useEffect(() => {
+    if (isAlreadyAssign) {
+      const timer = setTimeout(() => {
+        setIsAlreadyAssign(false);
+        clearTimeout(timer);
+      }, 4000);
+    }
+  }, [isAlreadyAssign]);
+  const onAccept = async () => {
+    await socket.emit("ACCEPT_APPOINTMENT", {
       driver,
-      appointment,
+      appointment: newAppointment,
     });
+    setIsWaiting(true);
+    setNewAppointment(null);
   };
 
   const onReject = () => {
-    setAppointment(null);
+    setNewAppointment(null);
     socket.emit("REJECT_APPOINTMENT", {
       driver,
-      appointment,
+      newAppointment,
     });
   };
 
@@ -178,57 +199,255 @@ const Dashboard = () => {
             </Box>
           </Box>
         </Box>
-        <Box
-          sx={{
-            background: "#fff",
-            display: "flex",
-            alignItems: "center",
-            justifyContent: "space-between",
-            width: "100%",
-            padding: "10px",
-            borderRadius: "10px",
-            boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-            marginTop: "20px",
-            color: "#00155F",
-          }}
-        >
-          <Box>
-            <Box
-              sx={{
-                display: "flex",
-                alignItems: "center",
-                marginBottom: "10px",
-              }}
-            >
-              <FmdGoodOutlinedIcon />
+        {isAlreadyAssign && (
+          <Box
+            sx={{
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              padding: "10px",
+              borderRadius: "10px",
+              boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+              marginTop: "20px",
+              color: "#00155F",
+            }}
+          >
+            <Box>
               <Typography
                 sx={{
                   fontSize: "14px",
                   fontWeight: 600,
                   marginLeft: "10px",
                   fontFamily: "Montserrat",
-                  color: "#777",
                 }}
               >
-                Vị trí hiện tại:
+                Chuyến xe đã được điều phối cho tài xế khác
               </Typography>
             </Box>
-            <Typography
+          </Box>
+        )}
+        {isWaiting ? (
+          <Box
+            sx={{
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              padding: "10px",
+              borderRadius: "10px",
+              boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+              marginTop: "20px",
+              color: "#00155F",
+            }}
+          >
+            <Box>
+              <LinearProgress color="inherit" />
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 600,
+                  marginLeft: "10px",
+                  fontFamily: "Montserrat",
+                  marginTop: "20px",
+                }}
+              >
+                Xác nhận chuyến đi thành công. Vui lòng đợi trong ít phút
+              </Typography>
+            </Box>
+          </Box>
+        ) : (
+          <Box
+            sx={{
+              background: "#fff",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "space-between",
+              width: "100%",
+              padding: "10px",
+              borderRadius: "10px",
+              boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+              marginTop: "20px",
+              color: "#00155F",
+            }}
+          >
+            <Box>
+              <Box
+                sx={{
+                  display: "flex",
+                  alignItems: "center",
+                  marginBottom: "10px",
+                }}
+              >
+                <FmdGoodOutlinedIcon />
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    marginLeft: "10px",
+                    fontFamily: "Montserrat",
+                    color: "#777",
+                  }}
+                >
+                  Vị trí hiện tại:
+                </Typography>
+              </Box>
+              <Typography
+                sx={{
+                  fontSize: "14px",
+                  fontWeight: 500,
+                  marginLeft: "10px",
+                  fontFamily: "Montserrat",
+                }}
+              >
+                {driver?.currentAddress}
+              </Typography>
+            </Box>
+          </Box>
+        )}
+
+        {appointmentAssigned && (
+          <Box
+            sx={{
+              background: "#fff",
+              display: "flex",
+              flexDirection: "column",
+              color: "#00155F",
+              boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
+              borderRadius: "20px",
+              marginBottom: "10px",
+              padding: "20px 10px",
+              marginTop: "20px",
+            }}
+          >
+            <Box sx={{ marginBottom: "20px" }}>
+              <Typography
+                sx={{
+                  fontSize: "16px",
+                  fontWeight: 600,
+                  fontFamily: "Montserrat",
+                }}
+              >
+                Đang đón khách
+              </Typography>
+            </Box>
+            <Box
               sx={{
-                fontSize: "14px",
-                fontWeight: 500,
-                marginLeft: "10px",
-                fontFamily: "Montserrat",
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
               }}
             >
-              {driver?.currentAddress}
-            </Typography>
+              <img className="avatar" src="imgs/avatar-men.png" alt="" />
+              <Box sx={{ marginLeft: "20px" }}>
+                <Typography
+                  sx={{
+                    fontSize: "16px",
+                    fontWeight: 600,
+                    fontFamily: "Montserrat",
+                  }}
+                >
+                  {appointmentAssigned?.clientName}
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    fontFamily: "Montserrat",
+                    color: "#FF7F00",
+                  }}
+                >
+                  {formatPhoneNumber(appointmentAssigned?.clientPhone)}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <AdjustIcon></AdjustIcon>
+              <Box
+                sx={{
+                  marginLeft: "20px",
+                  paddingBottom: "10px",
+                  borderBottom: "1px solid #777",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    fontFamily: "Montserrat",
+                    color: "#777",
+                    marginBottom: "10px",
+                  }}
+                >
+                  Địa điểm đón khách
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    fontFamily: "Montserrat",
+                  }}
+                >
+                  {appointmentAssigned?.startPoint}
+                </Typography>
+              </Box>
+            </Box>
+
+            <Box
+              sx={{
+                display: "flex",
+                alignItems: "center",
+                marginBottom: "20px",
+              }}
+            >
+              <FmdGoodIcon
+                sx={{
+                  color: "#FF7F00",
+                }}
+              ></FmdGoodIcon>
+              <Box
+                sx={{
+                  marginLeft: "20px",
+                  paddingBottom: "10px",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 600,
+                    fontFamily: "Montserrat",
+                    color: "#777",
+                    marginBottom: "10px",
+                  }}
+                >
+                  Địa điểm trả khách
+                </Typography>
+                <Typography
+                  sx={{
+                    fontSize: "14px",
+                    fontWeight: 500,
+                    fontFamily: "Montserrat",
+                  }}
+                >
+                  {appointmentAssigned?.endPoint}
+                </Typography>
+              </Box>
+            </Box>
           </Box>
-        </Box>
+        )}
       </Box>
 
       {/* Notification new apppoiment */}
-      {!!appointment && (
+      {!!newAppointment && (
         <Box
           sx={{
             background: "#fff",
@@ -264,7 +483,7 @@ const Dashboard = () => {
                   fontFamily: "Montserrat",
                 }}
               >
-                {appointment?.clientName}
+                {newAppointment?.clientName}
               </Typography>
               <Typography
                 sx={{
@@ -274,7 +493,7 @@ const Dashboard = () => {
                   color: "#FF7F00",
                 }}
               >
-                {formatPhoneNumber(appointment?.clientPhone)}
+                {formatPhoneNumber(newAppointment?.clientPhone)}
               </Typography>
             </Box>
           </Box>
@@ -308,7 +527,7 @@ const Dashboard = () => {
                   fontFamily: "Montserrat",
                 }}
               >
-                {appointment?.startPoint}
+                {newAppointment?.startPoint}
               </Typography>
             </Box>
           </Box>
@@ -345,7 +564,7 @@ const Dashboard = () => {
                   fontFamily: "Montserrat",
                 }}
               >
-                {appointment?.endPoint}
+                {newAppointment?.endPoint}
               </Typography>
             </Box>
           </Box>

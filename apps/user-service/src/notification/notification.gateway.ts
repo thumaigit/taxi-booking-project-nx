@@ -52,11 +52,6 @@ export class NotificationGateway
     });
 
     const appointmentId = drivers[0].appointmentId;
-    this.driverToAppointmentService.updateByInfo({
-      appointmentId,
-      driverId: driverMinDistance.driverId,
-      action: "ASSIGNED",
-    });
 
     return await this.appointmentService.updateAppointment(appointmentId, {
       driverId: driverMinDistance.driverId,
@@ -95,13 +90,17 @@ export class NotificationGateway
           appointmentId
         );
 
-      await this.handleAssign(acceptedDrivers);
+      const result = await this.handleAssign(acceptedDrivers);
       driver.to("publicMessages").emit("newMessage", {
         title: "ASSIGN_APPOINTMENT",
         value: appointmentId,
       });
+
+      driver
+        .to(`appointment-${appointmentId}`)
+        .emit("assignAppointment", result);
       clearTimeout(timer);
-    }, 15000);
+    }, 10000);
   }
 
   @SubscribeMessage("ASSIGN_APPOINTMENT")
