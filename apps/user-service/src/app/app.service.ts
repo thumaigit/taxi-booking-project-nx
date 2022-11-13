@@ -233,4 +233,17 @@ export class AppService {
       to: customer_phone,
     });
   }
+
+  async callCustomer(customer_phone: string) {
+    return this.twilioService.client.calls.create({
+      url: 'http://demo.twilio.com/docs/voice.xml',
+      to: customer_phone,
+      from: process.env.TWILIO_PHONE_NUMBER,
+    })
+    .then(call => console.log(call.sid));
+  }
+
+  async retrieveCallInfo(dto: any) {
+    return dto.data;
+  }
 }

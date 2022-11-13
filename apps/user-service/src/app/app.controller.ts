@@ -43,7 +43,7 @@ export class AppController {
 
   @UseGuards(AuthGuard('jwt'))
   @Post('ride')
-  createAccountWriteValidation(@Body() dto: Ride) {
+  createRide(@Body() dto: Ride) {
     return this.appService.createRides(dto);
   }
 
@@ -82,4 +82,14 @@ export class AppController {
     return result;
   }
 
+  @Get(':customer_phone/call')
+  callCustomer(@Param('customer_phone') customer_phone: string): Promise<any> {
+    const result = this.appService.callCustomer(customer_phone);
+    return result;
+  }
+
+  @Post('incoming-call')
+  retrieveCallInfo(@Body() dto: any) {
+    return this.appService.retrieveCallInfo(dto);
+  }
 }
