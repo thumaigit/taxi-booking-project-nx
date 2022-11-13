@@ -70,6 +70,16 @@ export function CallCenter(props: CallCenterProps) {
     }));
   }, []);
 
+  useEffect(() => {
+    socket.on("newMessage", (payload) => {
+      console.log(payload);
+    });
+
+    return () => {
+      socket.off("newMessage");
+    };
+  }, []);
+
   const handleSelectChange = useCallback(
     (event: ChangeEvent<HTMLSelectElement>) => {
       const value = event.target.value;

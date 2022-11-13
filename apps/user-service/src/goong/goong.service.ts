@@ -1,7 +1,7 @@
 import { Injectable } from "@nestjs/common";
 import Axios from "axios";
 
-const goongKey = "nfDk3FDdQtt1H7u2xBoK3cFou0usd0rMmLnJ3AzJ";
+const goongKey = "pRfeZVXmE8uiKsc11ei2biHpAqgXK9eeABgMUQm5";
 const goong = "https://rsapi.goong.io";
 
 @Injectable()

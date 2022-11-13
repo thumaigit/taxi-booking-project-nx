@@ -5,7 +5,9 @@ import {
   OnGatewayConnection,
   OnGatewayDisconnect,
 } from "@nestjs/websockets";
+import { DriverToAppointment } from "@prisma/client";
 import { Server, Socket } from "socket.io";
+import { AppointmentService } from "../appointment/appointment.service";
 import { DriverService } from "../driver/driver.service";
 import { DriverToAppointmentService } from "../driverToAppointment/driverToAppointment.service";
 
@@ -17,31 +19,58 @@ export class NotificationGateway
 
   constructor(
     private driverService: DriverService,
+    private appointmentService: AppointmentService,
     private driverToAppointmentService: DriverToAppointmentService
   ) {}
 
   async handleConnection(socket: Socket) {
-    console.log("Connected");
+    socket.join("publicMessages");
   }
 
   async handleDisconnect(socket: Socket) {
     console.log("Disconnected");
     socket.disconnect();
   }
-  // Dispatcher action
-  @SubscribeMessage("JOIN_ROOM")
-  async handJoinRoom(driver: Socket, payload) {
-    const room_id = "car:567";
-    driver.join(room_id);
-    console.log(driver.rooms);
+
+  async handleAssign(drivers: DriverToAppointment[]) {
+    if (drivers.length < 1) {
+      return;
+    }
+
+    const distances = drivers.map((driver) => {
+      const direction = JSON.parse(driver.direction);
+
+      return direction.distance.value;
+    });
+
+    // eslint-disable-next-line prefer-spread
+    const minDistance = Math.min.apply(Math, distances);
+    const driverMinDistance = drivers.find((driver) => {
+      const direction = JSON.parse(driver.direction);
+
+      return direction.distance.value === minDistance;
+    });
+
+    const appointmentId = drivers[0].appointmentId;
+    this.driverToAppointmentService.updateByInfo({
+      appointmentId,
+      driverId: driverMinDistance.driverId,
+      action: "ASSIGNED",
+    });
+
+    return await this.appointmentService.updateAppointment(appointmentId, {
+      driverId: driverMinDistance.driverId,
+    });
   }
 
   // Dispatcher action
   @SubscribeMessage("NEW_APPOINTMENT")
   async newAppointment(driver: Socket, payload) {
     const { id: appointmentId, startPoint } = payload;
-    driver.join(`appointment-${appointmentId}`);
-
+    driver.to("publicMessages").emit("newMessage", {
+      title: "NEW_APPOINTMENT",
+      value: appointmentId,
+    });
     const drivers = await this.driverService.findDriverForAppointment(
       startPoint
     );
@@ -54,10 +83,25 @@ export class NotificationGateway
         direction: JSON.stringify(direction),
       });
       driver.join(`driver-${driverId}`);
-      driver.broadcast
+      driver
         .to(`driver-${driverId}`)
         .emit("newAppointment", { ...payload, direction });
     });
+
+    // Affter 1 mins then auto assign for driver
+    const timer = setTimeout(async () => {
+      const acceptedDrivers =
+        await this.driverToAppointmentService.findAcceptedDrivers(
+          appointmentId
+        );
+
+      await this.handleAssign(acceptedDrivers);
+      driver.to("publicMessages").emit("newMessage", {
+        title: "ASSIGN_APPOINTMENT",
+        value: appointmentId,
+      });
+      clearTimeout(timer);
+    }, 15000);
   }
 
   @SubscribeMessage("ASSIGN_APPOINTMENT")
@@ -79,11 +123,15 @@ export class NotificationGateway
       action: "ACCEPTED",
     });
 
-    console.log(payload);
     driver.join(`appointment-${appointmentId}`);
     driver.broadcast
       .to(`appointment-${appointmentId}`)
       .emit("acceptAppointment", { ...payload, action: "ACCEPTED" });
+
+    driver.to("publicMessages").emit("newMessage", {
+      title: "ACCEPT_APPOINTMENT",
+      value: appointmentId,
+    });
   }
 
   @SubscribeMessage("REJECT_APPOINTMENT")
@@ -101,6 +149,11 @@ export class NotificationGateway
     driver.broadcast
       .to(`appointment-${appointmentId}`)
       .emit("rejectAppointment", { ...payload, action: "REJECTED" });
+
+    driver.to("publicMessages").emit("newMessage", {
+      title: "REJECT_APPOINTMENT",
+      value: appointmentId,
+    });
   }
 
   @SubscribeMessage("CANCEL_APPOINTMENT")

@@ -12,7 +12,11 @@ export class AppointmentService {
 
   async findAll() {
     try {
-      return await prisma.appointment.findMany();
+      return await prisma.appointment.findMany({
+        orderBy: {
+          id: "desc",
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -60,7 +64,9 @@ export class AppointmentService {
         where: {
           id: +id,
         },
-        data,
+        data: {
+          ...data,
+        },
       });
 
       return appointment;

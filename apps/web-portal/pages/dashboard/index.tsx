@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import { WebsocketContext } from "@@contexts/WebsocketContext";
 import { useCreateAppointmentMutation } from "@@store/api";
 import { Box, Button, TextField, Typography } from "@mui/material";
@@ -6,15 +7,14 @@ import { useContext, useEffect, useState } from "react";
 const Dashboard = () => {
   const socket = useContext(WebsocketContext);
   const appointmentInit = {
-    clientName : "Mai Thị Hằng Thư",
-    clientPhone : "0987654321",
+    clientName: "Mai Thị Hằng Thư",
+    clientPhone: "0987654321",
     startPoint:
       "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
     endPoint:
       "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
   };
-  const [drivers, setDrivers] = useState([]);
-  const [driverAccept, setDriverAccept] = useState(null);
+
   const [createAppointment, createResult] = useCreateAppointmentMutation();
 
   const [form, setValues] = useState({
@@ -37,21 +37,14 @@ const Dashboard = () => {
   };
 
   useEffect(() => {
-    socket.on("acceptAppointment", (payload) => {
-      const { driver } = payload;
-      setDriverAccept(driver);
+    socket.on("newMessage", (payload) => {
+      console.log(payload);
     });
 
     return () => {
-      socket.off("acceptAppointment");
+      socket.off("newMessage");
     };
   }, []);
-
-  useEffect(() => {
-    if (driverAccept) {
-      setDrivers([...drivers, driverAccept]);
-    }
-  }, [driverAccept]);
 
   useEffect(() => {
     if (createResult.isSuccess) {

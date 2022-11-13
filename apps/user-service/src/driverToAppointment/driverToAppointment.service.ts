@@ -20,9 +20,24 @@ export class DriverToAppointmentService {
         },
         include: {
           appointment: true,
-          driver: true,          
-        }
+          driver: true,
+        },
       });
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async findAcceptedDrivers(appointmentId: number) {
+    try {
+      const response = await prisma.driverToAppointment.findMany({
+        where: {
+          appointmentId,
+          action: "ACCEPTED",
+        },
+      });
+
+      return Promise.all(response);
     } catch (error) {
       console.log(error);
     }
