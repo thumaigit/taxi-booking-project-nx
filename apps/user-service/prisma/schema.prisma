@@ -10,53 +10,31 @@ datasource db {
   url      = "file:./dev.db"
 }
 
-model Ride {
-  id             String   @id @default(cuid())
-  dispatcher_id  String
-  pickup_address String
-  arrive_address String
-  payment        String
-  car_type       String
-  dispatcher     Dispatcher    @relation(fields: [dispatcher_id], references: [id])
-  created_at     DateTime @default(now())
-  /// @HideField({ input: true })
-  updated_at     DateTime @updatedAt
-  /// @DtoUpdateOptional
-  /// @HideField({ input: true })
-}
-
 model Dispatcher {
-  id              String   @id @default(cuid())
-  full_name       String
-  phone_number    String   @unique
-  user_password   String
-  ride_history    Ride[]
+  id             String        @id @default(cuid())
+  full_name      String
+  phone_number   String        @unique
+  user_password  String
+  history        Appointment[]
   /// @DtoRelationCanCreateOnCreate
-  status          String?  @default("OFFLINE")
-  firebase_token  String?  @default("")
-  created_at      DateTime @default(now())
+  status         String?       @default("OFFLINE")
+  firebase_token String?       @default("")
+  created_at     DateTime      @default(now())
   /// @HideField({ input: true })
-  updated_at      DateTime @updatedAt
+  updated_at     DateTime      @updatedAt
   /// @DtoUpdateOptional
   /// @HideField({ input: true })
-}
-
-model DriverOnline {
-  driver_id       String  @unique
-  current_address String?
-  car_type        String?
-  status          String? @default("READY")
 }
 
 model Client {
-  id              Int      @id @default(autoincrement())
-  full_name       String
-  phone_number    String   @unique
-  user_password   String
-  history         Appointment[]
+  id            Int           @id @default(autoincrement())
+  full_name     String
+  phone_number  String        @unique
+  user_password String
+  history       Appointment[]
   /// @DtoRelationCanCreateOnCreate
-  createdAt       DateTime @default(now())
-  updated_at      DateTime @updatedAt
+  createdAt     DateTime      @default(now())
+  updated_at    DateTime      @updatedAt
   /// @DtoUpdateOptional
   /// @HideField({ input: true })
 }
@@ -79,8 +57,8 @@ model Driver {
 
 model Appointment {
   id                  Int                   @id @default(autoincrement())
-  clientName          String
-  clientPhone         String
+  clientName          String?
+  clientPhone         String?
   startPoint          String
   startLocation       String?
   endPoint            String
@@ -90,8 +68,10 @@ model Appointment {
   driverAssigned      Driver?               @relation(fields: [driverId], references: [id])
   driverId            String?
   driverToAppointment DriverToAppointment[]
-  client_id           Int                   @default(-1)
-  client              Client                @relation(fields: [client_id], references: [id])
+  clientId            Int?
+  client              Client?               @relation(fields: [clientId], references: [id])
+  dispatcher          Dispatcher?           @relation(fields: [dispatcherId], references: [id])
+  dispatcherId        String?
 }
 
 model DriverToAppointment {
