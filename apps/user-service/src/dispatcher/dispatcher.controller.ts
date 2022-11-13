@@ -49,6 +49,7 @@ export class DispatcherController {
 
   @Post("incoming-call")
   retrieveCallInfo(@Body() dto: any) {
-    return this.dispatcherService.retrieveCallInfo(dto);
+    const result = this.dispatcherService.retrieveCallInfo(dto);
+    return result;
   }
 }

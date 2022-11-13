@@ -35,14 +35,14 @@ export interface PostRide {
 }
 
 const renderUser = {
-  fullName: "",
-  phoneNumber: "",
-  currentArriveAddress: "",
-  currentPickupAddress: "",
-  currentCarType: "4 seats",
-  currentPayment: "cash",
+  fullName: '',
+  phoneNumber: '',
+  currentArriveAddress: '',
+  currentPickupAddress: '',
+  currentCarType: '4 seats',
+  currentPayment: 'cash',
   rideHistory: [],
-  frequentlyAddress: [{ arrive_address: "" }],
+  frequentlyAddress: [{ arrive_address: '' }],
 };
 
 export function CallCenter(props: CallCenterProps) {
@@ -103,10 +103,10 @@ export function CallCenter(props: CallCenterProps) {
     };
 
     const reponse = await fetch(`http://localhost:3000/api/ride`, {
-      method: "POST",
+      method: 'POST',
       body: JSON.stringify(currentRide),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization: `Bearer ${token}`,
       },
     });
@@ -132,9 +132,9 @@ export function CallCenter(props: CallCenterProps) {
     const reponse = await fetch(
       `http://localhost:3000/api/${pickupAddress}/assign`,
       {
-        method: "GET",
+        method: 'GET',
         headers: {
-          "Content-Type": "application/json",
+          'Content-Type': 'application/json',
           Authorization: `Bearer ${token}`,
         },
       }
@@ -156,19 +156,19 @@ export function CallCenter(props: CallCenterProps) {
   const sentNotification = async (driver: string) => {
     const notificationBody = {
       to: `${driver}`,
-      priority: "high",
+      priority: 'high',
       notification: {
-        body: "Got Ride!",
+        body: 'Got Ride!',
       },
     };
 
-    const reponse = await fetch(`https://fcm.googleapis.com/fcm/send`, {
-      method: "POST",
+    const response = await fetch(`https://fcm.googleapis.com/fcm/send`, {
+      method: 'POST',
       body: JSON.stringify(notificationBody),
       headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
         Authorization:
-          "key=AAAAFQ7SrF0:APA91bGQ5VhXQCBMndX_4uytFVycZzuZ641kCjNg7IJCjLA7x9RUmprDAvQZomRLrZzhuQawy2o-HaT3h2yxaySpgPnDUF1FdWMrsVKoDuMKlThlM9LG6IxI96MnEDY9j5xP0gsdL3NQ",
+          'key=AAAAFQ7SrF0:APA91bGQ5VhXQCBMndX_4uytFVycZzuZ641kCjNg7IJCjLA7x9RUmprDAvQZomRLrZzhuQawy2o-HaT3h2yxaySpgPnDUF1FdWMrsVKoDuMKlThlM9LG6IxI96MnEDY9j5xP0gsdL3NQ',
       },
     });
     console.log(driver);
@@ -200,7 +200,7 @@ export function CallCenter(props: CallCenterProps) {
   };
 
   const onSearchMap = async () => {
-    const goongHost = "https://rsapi.goong.io";
+    const goongHost = 'https://rsapi.goong.io';
     const apiKey = `api_key=${MAP_API_KEY}`;
     const arriveAddParams = `geocode?address=${inputs.currentArriveAddress}`;
     const pickupAddParams = `geocode?address=${inputs.currentPickupAddress}`;
@@ -223,16 +223,16 @@ export function CallCenter(props: CallCenterProps) {
   };
 
   const handleCallAccept = () => {
-    setInputs((input) => ({ ...input, phoneNumber: "01231231238" }));
+    setInputs((input) => ({ ...input, phoneNumber: '01231231238' }));
   };
 
   const handleLogout = () => {
-    localStorage.setItem("token", "");
-    window.location.href = "/";
+    localStorage.setItem('token', '');
+    window.location.href = '/';
   };
 
   useEffect(() => {
-    if (inputs.phoneNumber?.length >= 11) {
+    if (inputs.phoneNumber?.length >= 9) {
       fetch(`http://localhost:3000/api/${inputs.phoneNumber}/ride`, {
         headers: {
           Authorization: `Bearer ${token}`,
@@ -259,7 +259,7 @@ export function CallCenter(props: CallCenterProps) {
   }, [inputs.phoneNumber, token, userId]);
 
   useEffect(() => {
-    const token = localStorage.getItem("token");
+    const token = localStorage.getItem('token');
     setToken(token);
   }, []);
 
@@ -268,165 +268,135 @@ export function CallCenter(props: CallCenterProps) {
   };
 
   return (
-    <>
-      <div className={styles["wrapper"]}>
-        <div className={styles["container"]}>
-          <div className={styles["title"]}>
-            <h1>Booking Now</h1>
-          </div>
-          <div className={styles["text-container"]}>
-            <span>Customer is calling...</span>
-            <button onClick={handleCallAccept}>Accept</button>
-          </div>
-          <div className={styles["text-container"]}>
-            <button onClick={handleLogout}>Logout</button>
-          </div>
-          <div className={styles["card"]}>
-            <form onSubmit={handleSubmit} className={styles["form"]}>
-              <div className={styles["text-container"]}>
-                <div className={styles["layer"]}>
-                  <h4>User Details</h4>
-                  <label>
-                    <input
-                      placeholder="Fullname"
-                      type="text"
-                      name="fullName"
-                      value={inputs?.fullName || ""}
-                      onChange={handleChange}
-                      required
-                    />
-                  </label>
-                  <label>
-                    <input
-                      placeholder="Phone number"
-                      type="text"
-                      name="phoneNumber"
-                      value={inputs?.phoneNumber || ""}
-                      onChange={handleNumberChange}
-                      required
-                    />
-                  </label>
-                  <label>
-                    <h5>Top 5 latest calls</h5>
-                    <table className={styles["history-table"]}>
-                      <thead>
-                        <tr>
-                          <th>Arrive Add.</th>
-                          <th>Pickup Add.</th>
-                          <th>Payment</th>
-                          <th>Car Type</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {inputs?.rideHistory?.map((ride, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{ride.arrive_address}</td>
-                              <td>{ride.pickup_address}</td>
-                              <td>{ride.payment}</td>
-                              <td>{ride.car_type}</td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </label>
-                  <label>
-                    <h5>Top 5 frequently arrive address</h5>
-                    <table className={styles["history-table"]}>
-                      <thead>
-                        <tr>
-                          <th>Arrive Add.</th>
-                          <th>Action</th>
-                        </tr>
-                      </thead>
-                      <tbody>
-                        {inputs?.frequentlyAddress?.map((add, index) => {
-                          return (
-                            <tr key={index}>
-                              <td>{add.arrive_address}</td>
-                              <td>
-                                <button
-                                  onClick={() =>
-                                    onSetArriveAddress(add.arrive_address)
-                                  }
-                                >
-                                  Pick
-                                </button>
-                              </td>
-                            </tr>
-                          );
-                        })}
-                      </tbody>
-                    </table>
-                  </label>
-                </div>
-                <div className={styles["layer"]}>
-                  <h4>Address Details</h4>
-                  <label>
-                    <input
-                      placeholder="Arrive Address"
-                      type="text"
-                      name="currentArriveAddress"
-                      value={inputs?.currentArriveAddress || ""}
-                      onChange={handleChange}
-                      required
-                    />
-                  </label>
-                  <label>
-                    <input
-                      placeholder="Pickup Address"
-                      type="text"
-                      name="currentPickupAddress"
-                      value={inputs?.currentPickupAddress || ""}
-                      onChange={handleChange}
-                      required
-                    />
-                    <button onClick={onSearchMap}>Search Map</button>
-                  </label>
-                  <label>
-                    <h5>Map</h5>
-                    <div className={styles["map-container"]}></div>
-                  </label>
-                </div>
-                <div className={styles["layer"]}>
-                  <h4>Ride Details</h4>
-                  <label>
-                    <h5>Car Type</h5>
-                    <select
-                      name="currentCarType"
-                      value={inputs?.currentCarType}
-                      onChange={handleSelectChange}
-                      required
-                    >
-                      <option value="4 seats">4 Seats</option>
-                      <option value="7 seats">7 Seats</option>
-                      <option value="any">Any</option>
-                    </select>
-                  </label>
-                  <label>
-                    <h5>Payment</h5>
-                    <select
-                      name="currentPayment"
-                      value={inputs?.currentPayment}
-                      onChange={handleSelectChange}
-                      required
-                    >
-                      <option value="cash">Cash</option>
-                      <option value="card">Card</option>
-                    </select>
-                  </label>
-                </div>
-                <div className={styles["align-right"]}>
-                  <input type="submit" value={"Book Ride"} />
-                </div>
-              </div>
-            </form>
-          </div>
+    <div className={styles.container}>
+      <div className={styles.header}>
+        <h2>Booking Now</h2>
+        <div>
+          <span>Hello Dispatcher!</span>
+          <button onClick={handleLogout}>Logout</button>
         </div>
       </div>
-      <button onClick={onJoinRoom}>JOIN ROOM</button>
-    </>
+      <div className={styles.content}>
+        <form onSubmit={handleSubmit}>
+          <div>
+            <div className={styles.flex}>
+              <div className={styles.client}>
+                <h4>Client Info</h4>
+                <input
+                  placeholder="Name"
+                  type="text"
+                  name="fullName"
+                  value={inputs?.fullName || ''}
+                  onChange={handleChange}
+                  required
+                />
+
+                <input
+                  placeholder="Phone number"
+                  type="text"
+                  name="phoneNumber"
+                  value={inputs?.phoneNumber || ''}
+                  onChange={handleNumberChange}
+                  required
+                />
+
+                <input
+                  placeholder="Arrive Address"
+                  type="text"
+                  name="currentArriveAddress"
+                  value={inputs?.currentArriveAddress || ''}
+                  onChange={handleChange}
+                  required
+                />
+                <input
+                  placeholder="Pickup Address"
+                  type="text"
+                  name="currentPickupAddress"
+                  value={inputs?.currentPickupAddress || ''}
+                  onChange={handleChange}
+                  required
+                />
+                <select
+                  name="currentCarType"
+                  value={inputs?.currentCarType}
+                  onChange={handleSelectChange}
+                  required
+                >
+                  <option value="4 seats">4 Seats</option>
+                  <option value="7 seats">7 Seats</option>
+                  <option value="any">Any</option>
+                </select>
+                <select
+                  name="currentPayment"
+                  value={inputs?.currentPayment}
+                  onChange={handleSelectChange}
+                  required
+                >
+                  <option value="cash">Cash</option>
+                  <option value="card">Card</option>
+                </select>
+                <div>
+                  <input type="submit" value={'Assign Driver'} />
+                </div>
+              </div>
+              <div className={styles.history}>
+                <h4>Latest Rides</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Arrive Add.</th>
+                      <th>Pickup Add.</th>
+                      <th>Payment</th>
+                      <th>Car Type</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inputs?.rideHistory?.map((ride, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>{ride.arrive_address}</td>
+                          <td>{ride.pickup_address}</td>
+                          <td>{ride.payment}</td>
+                          <td>{ride.car_type}</td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+
+                <h4>Frequently booking destinations</h4>
+                <table>
+                  <thead>
+                    <tr>
+                      <th>Arrive Add.</th>
+                      <th>Action</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {inputs?.frequentlyAddress?.map((add, index) => {
+                      return (
+                        <tr key={index}>
+                          <td>{add.arrive_address}</td>
+                          <td>
+                            <button
+                              onClick={() =>
+                                onSetArriveAddress(add.arrive_address)
+                              }
+                            >
+                              Pick
+                            </button>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            </div>
+          </div>
+        </form>
+      </div>
+    </div>
   );
 }
 
