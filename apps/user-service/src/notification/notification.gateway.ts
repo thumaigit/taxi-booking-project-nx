@@ -177,4 +177,10 @@ export class NotificationGateway
   async handleOffline(driver: Socket) {
     driver.disconnect();
   }
+
+  // TWILLO
+  @SubscribeMessage("NEW_INCOMING_CALL")
+  async handleNewIncomingCall(driver: Socket, phoneNumber: string) {
+    driver.to("publicMessages").emit("newIncomingCall", phoneNumber);
+  }
 }

@@ -64,6 +64,7 @@ const Dashboard = () => {
       }, 4000);
     }
   }, [isAlreadyAssign]);
+
   const onAccept = async () => {
     await socket.emit("ACCEPT_APPOINTMENT", {
       driver,

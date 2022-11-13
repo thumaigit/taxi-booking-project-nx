@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { ChangeEvent, useCallback, useContext, useEffect } from "react";
 import { useState } from "react";
 import styles from "./index.module.css";
@@ -46,9 +47,9 @@ const renderUser = {
 
 export function CallCenter(props: CallCenterProps) {
   const socket = useContext(WebsocketContext);
-  const [appointmentId, setAppointmentId] = useState(null);
   const [token, setToken] = useState("");
   const [inputs, setInputs] = useState<User>(renderUser);
+  const [incomingCallPhone, setIncomingCallPhone] = useState("");
   const GOONG_MAPTILES_KEY = "qlG01cOG4q7MHDCzbpn7vA6GvKHs06W4lZlq3PLl";
   const MAP_API_KEY = "0zKkBcMbQKAkWsB23qQAeFiGPQN4uQ1tsMeN0ZdG";
   const adminId = "cl9chgyyq0000m1a6xoyu6rsb";
@@ -71,12 +72,12 @@ export function CallCenter(props: CallCenterProps) {
   }, []);
 
   useEffect(() => {
-    socket.on("newMessage", (payload) => {
-      console.log(payload);
+    socket.on("newIncomingCall", (phoneNumber) => {
+      setInputs({ ...inputs, phoneNumber });
     });
 
     return () => {
-      socket.off("newMessage");
+      socket.off("newIncomingCall");
     };
   }, []);
 
@@ -94,7 +95,7 @@ export function CallCenter(props: CallCenterProps) {
 
   const createRide = async () => {
     const currentRide = {
-      dispatcher_id: 'clafa2vz90000m1rnf6fll234',
+      dispatcher_id: "clafa2vz90000m1rnf6fll234",
       arrive_address: inputs.currentArriveAddress,
       pickup_address: inputs.currentPickupAddress,
       car_type: inputs.currentCarType,
@@ -262,25 +263,9 @@ export function CallCenter(props: CallCenterProps) {
     setToken(token);
   }, []);
 
-  useEffect(() => {
-    socket.on("newAppointment", (payload) => {
-      console.log(payload);
-      setAppointmentId(payload?.id);
-    });
-
-    socket.on("acceptAppointment", (payload) => {
-      console.log(payload);
-    });
-
-    return () => {
-      socket.off("newAppointment");
-      socket.off("acceptAppointment");
-    };
-  }, []);
-
   const onJoinRoom = () => {
-    socket.emit("JOIN_ROOM")
-  }
+    socket.emit("JOIN_ROOM");
+  };
 
   return (
     <>
