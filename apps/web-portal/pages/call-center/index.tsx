@@ -84,7 +84,7 @@ export function CallCenter(props: CallCenterProps) {
 
   const createRide = async () => {
     const currentRide = {
-      user_id: userId,
+      dispatcher_id: 'clafa2vz90000m1rnf6fll234',
       arrive_address: inputs.currentArriveAddress,
       pickup_address: inputs.currentPickupAddress,
       car_type: inputs.currentCarType,
@@ -100,20 +100,20 @@ export function CallCenter(props: CallCenterProps) {
       },
     });
 
-    if (reponse.status == 201) {
-      const customer_phone = '+84919396158';
-      const reponse = await fetch(
-        `http://localhost:3000/api/${customer_phone}/sms`,
-        {
-          method: "GET",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-        }
-      );
-      console.log('sms result: ', reponse);
-    }
+    // if (reponse.status == 201) {
+    //   const customer_phone = '+84919396158';
+    //   const reponse = await fetch(
+    //     `http://localhost:3000/api/${customer_phone}/sms`,
+    //     {
+    //       method: "GET",
+    //       headers: {
+    //         "Content-Type": "application/json",
+    //         Authorization: `Bearer ${token}`,
+    //       },
+    //     }
+    //   );
+    //   console.log('sms result: ', reponse);
+    // }
   };
 
   const assignDriver = async () => {
@@ -166,7 +166,7 @@ export function CallCenter(props: CallCenterProps) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     createRide();
-    assignDriver();
+    //assignDriver();
   };
 
   const handleNumberChange = useCallback(

@@ -27,10 +27,9 @@ export function Login(props: LoginProps) {
   const handleSubmit = async (event) => {
     event.preventDefault();
     const currentUser = {
-      full_name: 'admin',
+      full_name: 'dispatcher',
       phone_number: inputs.phoneNumber,
       user_password: inputs.password,
-      user_type: 'admin',
     };
     await fetch(`http://localhost:3000/api/user`, {
       method: 'POST',
@@ -87,7 +86,7 @@ export function Login(props: LoginProps) {
               />
             </div>
             <p className={styles['signup']}>
-            <a href="/login">Sign Up</a>
+            <a href="/login">Login</a>
             </p>
           </div>
         </div>

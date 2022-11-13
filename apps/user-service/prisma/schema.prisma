@@ -12,12 +12,12 @@ datasource db {
 
 model Ride {
   id             String   @id @default(cuid())
-  user_id        String
+  dispatcher_id  String
   pickup_address String
   arrive_address String
   payment        String
   car_type       String
-  user           User     @relation(fields: [user_id], references: [id])
+  dispatcher     Dispatcher    @relation(fields: [dispatcher_id], references: [id])
   created_at     DateTime @default(now())
   /// @HideField({ input: true })
   updated_at     DateTime @updatedAt
@@ -25,16 +25,14 @@ model Ride {
   /// @HideField({ input: true })
 }
 
-model User {
+model Dispatcher {
   id              String   @id @default(cuid())
   full_name       String
   phone_number    String   @unique
   user_password   String
-  user_type       String
   ride_history    Ride[]
   /// @DtoRelationCanCreateOnCreate
   status          String?  @default("OFFLINE")
-  current_address String?  @default("")
   firebase_token  String?  @default("")
   created_at      DateTime @default(now())
   /// @HideField({ input: true })
@@ -51,12 +49,16 @@ model DriverOnline {
 }
 
 model Client {
-  id         Int      @id @default(autoincrement())
-  name       String?
-  phone      String?
-  startPoint String?
-  endPoint   String?
-  createdAt  DateTime @default(now())
+  id              Int      @id @default(autoincrement())
+  full_name       String
+  phone_number    String   @unique
+  user_password   String
+  history         Appointment[]
+  /// @DtoRelationCanCreateOnCreate
+  createdAt       DateTime @default(now())
+  updated_at      DateTime @updatedAt
+  /// @DtoUpdateOptional
+  /// @HideField({ input: true })
 }
 
 model Driver {
@@ -88,6 +90,8 @@ model Appointment {
   driverAssigned      Driver?               @relation(fields: [driverId], references: [id])
   driverId            String?
   driverToAppointment DriverToAppointment[]
+  client_id           Int                   @default(-1)
+  client              Client                @relation(fields: [client_id], references: [id])
 }
 
 model DriverToAppointment {
