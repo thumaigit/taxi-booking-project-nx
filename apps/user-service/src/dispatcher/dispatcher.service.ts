@@ -104,19 +104,20 @@ export class DispatcherService {
     return user;
   }
 
-  async sendSMS(dto) {
-    const { driver, customerPhone } = dto;
+  async sendSMS(data) {
+    const { clientPhone, driverAssigned } = data;
 
     const body = `Tai xe dang den don ban.
-    Tai xe: ${driver.name},
-    So dien thoai: ${driver.phone}
-    Bien so: ${driver.carLicense},
-    Loai xe: ${driver.carName} - ${driver.carType}`;
+    Tai xe: ${driverAssigned.name},
+    So dien thoai: ${driverAssigned.phone}
+    Bien so: ${driverAssigned.carLicense},
+    Loai xe: ${driverAssigned.carName} - ${driverAssigned.carType}`;
 
+    console.log(body);
     return this.twilioService.client.messages.create({
       body: body,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: `+84${+customerPhone}`,
+      to: `+84${+clientPhone}`,
     });
   }
 

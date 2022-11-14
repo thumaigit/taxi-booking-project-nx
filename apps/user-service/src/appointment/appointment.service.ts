@@ -71,6 +71,9 @@ export class AppointmentService {
         data: {
           ...data,
         },
+        include: {
+          driverAssigned: true
+        }
       });
 
       return appointment;

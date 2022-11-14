@@ -97,11 +97,8 @@ export class NotificationGateway
         title: "ASSIGN_APPOINTMENT",
         value: appointmentId,
       });
-      const messageValue = {
-        customerPhone: payload.clientPhone,
-        driver: result,
-      };
-      this.dispatcherService.sendSMS(messageValue);
+
+      this.dispatcherService.sendSMS(result);
       driver
         .to(`appointment-${appointmentId}`)
         .emit("assignAppointment", result);
