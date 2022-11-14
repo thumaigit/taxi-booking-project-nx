@@ -44,7 +44,7 @@ const SignIn = () => {
             />
           </div>
           <button onClick={onSubmit} className="cta-btn">
-            Đăng nhập
+            Đăng ký
           </button>
           <Link className="forget-pass" href="/sign-in">
             <a className="forget-pass"> Đã có tài khoản? Đăng nhập</a>

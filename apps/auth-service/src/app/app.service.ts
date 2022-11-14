@@ -1,10 +1,10 @@
 import { Injectable } from '@nestjs/common';
 import { JwtService } from '@nestjs/jwt';
-import { User } from '@prisma/client';
+import { Dispatcher } from '@prisma/client';
 import Axios from 'axios';
 import * as bcrypt from 'bcrypt';
 
-export type UserReponse  = Omit<User, "user_password">;
+export type UserReponse  = Omit<Dispatcher, "user_password">;
 
 @Injectable()
 export class AppService {
@@ -17,9 +17,9 @@ export class AppService {
     return { message: 'Welcome to auth_service!' };
   }
 
-  async findUser(phoneNumber: string): Promise<User> {
+  async findUser(phoneNumber: string): Promise<Dispatcher> {
     const rootApi = `http://localhost:3000/api`;
-    const response = await Axios.get<User>(
+    const response = await Axios.get<Dispatcher>(
       `${rootApi}/${phoneNumber}/login`
     );
     return response.data;
