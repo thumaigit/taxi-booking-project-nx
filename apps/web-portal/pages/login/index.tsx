@@ -30,7 +30,7 @@ export function Login(props: LoginProps) {
       username: inputs.username,
       password: inputs.password,
     };
-    await fetch(`http://localhost:3333/api/auth/login`, {
+    await fetch(`${process.env.AUTH_SERVICE_API}/api/auth/login`, {
       method: 'POST',
       body: JSON.stringify(currentUser),
       headers: {
