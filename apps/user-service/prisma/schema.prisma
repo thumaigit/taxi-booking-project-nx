@@ -60,9 +60,7 @@ model Appointment {
   clientName          String?
   clientPhone         String?
   startPoint          String
-  startLocation       String?
   endPoint            String
-  endLocation         String?
   createdAt           DateTime              @default(now())
   updatedAt           DateTime              @updatedAt
   driverAssigned      Driver?               @relation(fields: [driverId], references: [id])
@@ -72,6 +70,8 @@ model Appointment {
   client              Client?               @relation(fields: [clientId], references: [id])
   dispatcher          Dispatcher?           @relation(fields: [dispatcherId], references: [id])
   dispatcherId        String?
+  carType             String                @default("any type")
+  payment             String                @default("cash")
 }
 
 model DriverToAppointment {

@@ -28,7 +28,7 @@ export class DispatcherService {
   private socketClient: Socket;
 
   public constructor(private readonly twilioService: TwilioService) {
-    this.socketClient = io("http://localhost:3000");
+    this.socketClient = io(process.env.USER_SERVICE_API);
   }
 
   async getClientRide(phoneNumber: string): Promise<CallUser> {
@@ -48,10 +48,10 @@ export class DispatcherService {
       where: {
         clientPhone: phoneNumber,
       },
-      by: ["endLocation"],
+      by: ["endPoint"],
       orderBy: {
         _count: {
-          endLocation: "desc",
+          endPoint: "desc",
         },
       },
       take: 5,
@@ -59,9 +59,9 @@ export class DispatcherService {
 
     return {
       basic_info: {
-        user_id: client.id,
-        full_name: client.full_name,
-        phone_number: client.phone_number,
+        user_id: client?.id,
+        full_name: client?.full_name,
+        phone_number: client?.phone_number,
       },
       ride_history: rides,
       frequently_address: clientFrequentlyAddress,

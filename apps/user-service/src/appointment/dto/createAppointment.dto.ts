@@ -1,5 +1,5 @@
 import { ApiProperty } from "@nestjs/swagger";
-import { IsNotEmpty, IsString } from "class-validator";
+import { IsNotEmpty, IsOptional, IsString } from "class-validator";
 
 export class createAppointmentDto {
   @ApiProperty()
@@ -21,4 +21,19 @@ export class createAppointmentDto {
   @IsString()
   @IsNotEmpty()
   endPoint: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  carType: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsNotEmpty()
+  payment: string;
+
+  @ApiProperty()
+  @IsString()
+  @IsOptional()
+  dispatcher_id?: string;
 }
