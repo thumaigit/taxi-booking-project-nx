@@ -103,7 +103,7 @@ const CallCenter = () => {
       if (data?.ride_history.length > 0) {
         setRideHistory(data.ride_history);
         setFrequentlyAddress(data.frequently_address);
-        setFormValue({ ...form, clientName: data[0]?.clientName });
+        setFormValue({ ...form, clientName: data[0].ride_history?.clientName });
       } else {
         const { clientPhone } = form;
         setAlert({

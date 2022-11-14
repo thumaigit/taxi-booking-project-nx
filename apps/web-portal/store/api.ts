@@ -13,6 +13,14 @@ export const userApi = createApi({
   }),
 
   endpoints: (builder) => ({
+    signIn: builder.mutation({
+      query: (body) => ({
+        url: "/sign-in",
+        method: "POST",
+        body,
+      }),
+    }),
+
     createAppointment: builder.mutation({
       query: (body) => ({
         url: "/appointment",
