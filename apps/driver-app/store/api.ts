@@ -20,7 +20,26 @@ export const userApi = createApi({
         body,
       }),
     }),
+
+    findById: builder.mutation({
+      query: (id: string) => ({
+        url: "/driver/sign-in",
+        method: "GET",
+      }),
+    }),
+
+    updateDriver: builder.mutation({
+      query: ({ id, body }) => ({
+        url: `/driver/${id}`,
+        method: "PUT",
+        body,
+      }),
+    }),
   }),
 });
 
-export const { useSignInMutation } = userApi;
+export const {
+  useSignInMutation,
+  useFindByIdMutation,
+  useUpdateDriverMutation,
+} = userApi;

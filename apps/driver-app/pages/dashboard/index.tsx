@@ -1,30 +1,41 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/exhaustive-deps */
+import { formatPhoneNumber } from "@@common/formatPhoneNumber";
 import { WebsocketContext } from "@@contexts/WebsocketContext";
+import { useUpdateDriverMutation } from "@@store/api";
+import { setDriver } from "@@store/appSlice";
 import { AppState } from "@@store/store";
 import AdjustIcon from "@mui/icons-material/Adjust";
+import AutorenewOutlinedIcon from "@mui/icons-material/AutorenewOutlined";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
-import MenuIcon from "@mui/icons-material/Menu";
-import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-import ToysOutlinedIcon from "@mui/icons-material/ToysOutlined";
 import FmdGoodOutlinedIcon from "@mui/icons-material/FmdGoodOutlined";
-import { Box, Button, Typography } from "@mui/material";
-import Switch from "@mui/material/Switch";
-import React, { useContext, useEffect, useState } from "react";
-import { useSelector } from "react-redux";
-import { formatPhoneNumber } from "@@common/formatPhoneNumber";
+import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
+import MenuIcon from "@mui/icons-material/Menu";
+import ToysOutlinedIcon from "@mui/icons-material/ToysOutlined";
+import { Box, Button, TextField, Typography } from "@mui/material";
+import CircularProgress from "@mui/material/CircularProgress";
 import LinearProgress from "@mui/material/LinearProgress";
+import Switch from "@mui/material/Switch";
+import { useContext, useEffect, useState } from "react";
+import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = () => {
   const socket = useContext(WebsocketContext);
+  const dispatch = useDispatch();
   const driver = useSelector((state: AppState) => state.app.driver);
   const [newAppointment, setNewAppointment] = useState(null);
   const [appointmentAssigned, setAppointmentAsigned] = useState(null);
+  const [newAddress, setNewAddress] = useState("");
   const [isOnline, setIsOnline] = useState(true);
   const [isWaiting, setIsWaiting] = useState(false);
   const [isAlreadyAssign, setIsAlreadyAssign] = useState(false);
-
+  const [updateDriver, updateResult] = useUpdateDriverMutation();
   const handleToggleStatus = () => {
     setIsOnline(!isOnline);
+  };
+
+  const handleUpdateAddress = () => {
+    updateDriver({ id: driver.id, body: { currentAddress: newAddress } });
   };
 
   useEffect(() => {
@@ -82,6 +93,21 @@ const Dashboard = () => {
     });
   };
 
+  useEffect(() => {
+    if (updateResult.isSuccess) {
+      dispatch(setDriver(updateResult.data));
+    }
+  }, [updateResult.isSuccess]);
+
+  useEffect(() => {
+    if (newAppointment) {
+      const timer = setTimeout(() => {
+        setNewAppointment(null);
+
+        clearTimeout(timer);
+      }, 10000);
+    }
+  }, [newAppointment]);
   return (
     <Box
       sx={{
@@ -229,6 +255,7 @@ const Dashboard = () => {
             </Box>
           </Box>
         )}
+
         {isWaiting ? (
           <Box
             sx={{
@@ -262,10 +289,8 @@ const Dashboard = () => {
         ) : (
           <Box
             sx={{
+              display: newAppointment ? "none" : "",
               background: "#fff",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "space-between",
               width: "100%",
               padding: "10px",
               borderRadius: "10px",
@@ -274,6 +299,58 @@ const Dashboard = () => {
               color: "#00155F",
             }}
           >
+            <Box sx={{ display: "flex" }}>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  fontFamily: "Montserrat",
+                  marginBottom: "10px",
+                  flexDirection: "column",
+                  color: "#555",
+                }}
+              >
+                <TextField
+                  size="small"
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                  }}
+                  value={newAddress}
+                  type="text"
+                  name="newAddress"
+                  onChange={(e) => {
+                    setNewAddress(e.target.value);
+                  }}
+                  inputProps={{
+                    style: {
+                      padding: "7px 10px",
+                      fontFamily: "Montserrat",
+                      fontWeight: 500,
+                      fontSize: "14px",
+                    },
+                  }}
+                  required
+                />
+              </Box>
+
+              {!updateResult.isLoading ? (
+                <AutorenewOutlinedIcon
+                  onClick={handleUpdateAddress}
+                  sx={{ mt: "5px", ml: "5px", cursor: "pointer" }}
+                />
+              ) : (
+                <CircularProgress
+                  sx={{
+                    width: "20px !important",
+                    height: "20px !important",
+                    mt: "7px",
+                    ml: "9px",
+                  }}
+                />
+              )}
+            </Box>
             <Box>
               <Box
                 sx={{

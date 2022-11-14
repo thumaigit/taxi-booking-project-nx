@@ -8,6 +8,7 @@ import {
 import { DriverToAppointment } from "@prisma/client";
 import { Server, Socket } from "socket.io";
 import { AppointmentService } from "../appointment/appointment.service";
+import { DispatcherService } from "../dispatcher/dispatcher.service";
 import { DriverService } from "../driver/driver.service";
 import { DriverToAppointmentService } from "../driverToAppointment/driverToAppointment.service";
 
@@ -20,6 +21,7 @@ export class NotificationGateway
   constructor(
     private driverService: DriverService,
     private appointmentService: AppointmentService,
+    private dispatcherService: DispatcherService,
     private driverToAppointmentService: DriverToAppointmentService
   ) {}
 
@@ -95,12 +97,16 @@ export class NotificationGateway
         title: "ASSIGN_APPOINTMENT",
         value: appointmentId,
       });
-
+      const messageValue = {
+        customerPhone: payload.clientPhone,
+        driver: result,
+      };
+      this.dispatcherService.sendSMS(messageValue);
       driver
         .to(`appointment-${appointmentId}`)
         .emit("assignAppointment", result);
       clearTimeout(timer);
-    }, 10000);
+    }, 15000);
   }
 
   @SubscribeMessage("ASSIGN_APPOINTMENT")

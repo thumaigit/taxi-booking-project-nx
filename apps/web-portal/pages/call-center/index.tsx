@@ -3,11 +3,15 @@
 import { WebsocketContext } from "@@contexts/WebsocketContext";
 import AdjustIcon from "@mui/icons-material/Adjust";
 import AlarmOutlinedIcon from "@mui/icons-material/AlarmOutlined";
+import CloseIcon from "@mui/icons-material/Close";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
-import CloseIcon from "@mui/icons-material/Close";
 import Alert from "@mui/material/Alert";
 
+import {
+  useCreateAppointmentMutation,
+  useFindInfoByPhoneMutation,
+} from "@@store/api";
 import {
   Box,
   Button,
@@ -18,10 +22,6 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
-import {
-  useCreateAppointmentMutation,
-  useGetAppointmentByPhoneMutation,
-} from "@@store/api";
 
 const CallCenter = () => {
   const socket = useContext(WebsocketContext);
@@ -30,23 +30,15 @@ const CallCenter = () => {
     clientName: "",
     startPoint: "",
     endPoint: "",
-    carType: "",
-  };
-  const appointmentInit = {
-    clientName: "Mai Thị Hằng Thư",
-    clientPhone: "0987654321",
-    startPoint:
-      "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
-    endPoint:
-      "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
-    carType: "",
+    carType: "any",
+    payment: "cash",
   };
 
   const [alert, setAlert] = useState(null);
   const [token, setToken] = useState("");
-  const [appointments, setAppointments] = useState(null);
-  const [getAppointment, getAppointmentResult] =
-    useGetAppointmentByPhoneMutation();
+  const [rideHistory, setRideHistory] = useState(null);
+  const [frequentlyAddress, setFrequentlyAddress] = useState([]);
+  const [findInfo, findResult] = useFindInfoByPhoneMutation();
   const [createAppointment, createResult] = useCreateAppointmentMutation();
 
   const [form, setFormValue] = useState(initValue);
@@ -62,10 +54,10 @@ const CallCenter = () => {
 
   useEffect(() => {
     socket.on("newIncomingCall", (clientPhone) => {
+      console.log(clientPhone);
       setFormValue({ ...form, clientPhone });
-      setIncomingCallPhone(clientPhone);
       setAlert({ message: "Bạn có cuộc gọi đến", severity: "info" });
-      getAppointment({ clientPhone, limit: 5 });
+      findInfo(clientPhone);
     });
 
     return () => {
@@ -79,7 +71,8 @@ const CallCenter = () => {
   };
   const handleCheckPhoneNumber = () => {
     const { clientPhone } = form;
-    getAppointment({ clientPhone: clientPhone, limit: 5 });
+    if (!clientPhone) return;
+    findInfo(clientPhone);
   };
   useEffect(() => {
     setToken(token);
@@ -95,11 +88,12 @@ const CallCenter = () => {
   }, [alert]);
 
   useEffect(() => {
-    if (getAppointmentResult.isSuccess) {
-      const { data } = getAppointmentResult;
+    if (findResult.isSuccess) {
+      const { data } = findResult;
 
-      if (data.length > 0) {
-        setAppointments(data);
+      if (data?.ride_history.length > 0) {
+        setRideHistory(data.ride_history);
+        setFrequentlyAddress(data.frequently_address);
         setFormValue({ ...form, clientName: data[0]?.clientName });
       } else {
         const { clientPhone } = form;
@@ -107,11 +101,11 @@ const CallCenter = () => {
           message: "Số điện thoại chưa có chuyến đi nào",
           severity: "info",
         });
-        setAppointments(null);
+        setRideHistory(null);
         setFormValue({ ...initValue, clientPhone });
       }
     }
-  }, [getAppointmentResult.isSuccess]);
+  }, [findResult.isSuccess]);
 
   useEffect(() => {
     if (createResult.isSuccess) {
@@ -333,65 +327,114 @@ const CallCenter = () => {
                 required
               />
             </Box>
-            <Box>
-              <Typography
-                sx={{
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                  marginRight: "10px",
-                  fontSize: "15px",
-                  marginBottom: "5px",
-                  color: "#555",
-                }}
-              >
-                Loại xe:
-              </Typography>
-              <Box
-                sx={{
-                  display: "flex",
-                  justifyContent: "space-between",
-                  alignItems: "center",
-                }}
-              >
-                <Select
-                  size="small"
-                  value={form.carType}
-                  name={"carType"}
-                  onChange={updateField}
-                  displayEmpty
-                  inputProps={{
-                    sx: {
-                      fontFamily: "Montserrat",
-                      fontWeight: 500,
-                      fontSize: "15px",
-                      padding: "5px 20px",
-                      textAlign: "center",
-                    },
-                  }}
-                >
-                  <MenuItem sx={{ fontFamily: "Montserrat" }} value={"4 chỗ"}>
-                    4 chỗ
-                  </MenuItem>
-                  <MenuItem sx={{ fontFamily: "Montserrat" }} value={"7 chỗ"}>
-                    7 chỗ
-                  </MenuItem>
-                  <MenuItem sx={{ fontFamily: "Montserrat" }} value="">
-                    Bất kỳ
-                  </MenuItem>
-                </Select>
-                <Button
-                  variant="contained"
+            <Box sx={{ display: "flex" }}>
+              <Box>
+                <Typography
                   sx={{
                     fontFamily: "Montserrat",
-                    fontWeight: 600,
-                    background: "#00155F",
-                    minWidth: "200px",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
+                    color: "#555",
                   }}
-                  onClick={handleSubmit}
                 >
-                  Đặt xe
-                </Button>
+                  Loại xe:
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Select
+                    size="small"
+                    value={form.carType}
+                    name={"carType"}
+                    onChange={updateField}
+                    displayEmpty
+                    inputProps={{
+                      sx: {
+                        fontFamily: "Montserrat",
+                        fontWeight: 500,
+                        fontSize: "15px",
+                        padding: "5px 20px",
+                        textAlign: "center",
+                      },
+                    }}
+                  >
+                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"4 chỗ"}>
+                      4 chỗ
+                    </MenuItem>
+                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"7 chỗ"}>
+                      7 chỗ
+                    </MenuItem>
+                    <MenuItem sx={{ fontFamily: "Montserrat" }} value="any">
+                      Bất kỳ
+                    </MenuItem>
+                  </Select>
+                </Box>
               </Box>
+              <Box sx={{ ml: "20px" }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
+                    color: "#555",
+                  }}
+                >
+                  Hình thức thanh toán:
+                </Typography>
+                <Box
+                  sx={{
+                    display: "flex",
+                    justifyContent: "space-between",
+                    alignItems: "center",
+                  }}
+                >
+                  <Select
+                    size="small"
+                    value={form.payment}
+                    name={"payment"}
+                    onChange={updateField}
+                    displayEmpty
+                    inputProps={{
+                      sx: {
+                        fontFamily: "Montserrat",
+                        fontWeight: 500,
+                        fontSize: "15px",
+                        padding: "5px 20px",
+                        textAlign: "center",
+                      },
+                    }}
+                  >
+                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"cash"}>
+                      Thanh toán bằng tiền mặt
+                    </MenuItem>
+                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"card"}>
+                      Thanh toán qua thẻ
+                    </MenuItem>
+                  </Select>
+                </Box>
+              </Box>
+            </Box>
+            <Box sx={{ mt: "20px" }}>
+              <Button
+                variant="contained"
+                sx={{
+                  fontFamily: "Montserrat",
+                  fontWeight: 600,
+                  background: "#00155F",
+                  minWidth: "200px",
+                }}
+                onClick={handleSubmit}
+              >
+                Đặt xe
+              </Button>
             </Box>
           </form>
         </Box>
@@ -405,9 +448,9 @@ const CallCenter = () => {
           padding: "0 20px",
         }}
       >
-        {appointments && (
+        {rideHistory && (
           <Box>
-            {/* <Box>
+            <Box>
               <Typography
                 sx={{
                   fontSize: "16px",
@@ -419,118 +462,46 @@ const CallCenter = () => {
               >
                 Top 5 địa chỉ di chuyển nhiều nhất
               </Typography>
-              <Box
-                sx={{
-                  background: "#fff",
-                  padding: "10px",
-                  color: "#00155F",
-                  borderRadius: "10px",
-                  marginBottom: "20px",
-                  boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
-                }}
-              >
+              {frequentlyAddress.map((value, index) => (
                 <Box
+                  key={index}
                   sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
+                    background: "#fff",
+                    padding: "10px",
+                    color: "#00155F",
+                    borderRadius: "10px",
+                    marginBottom: "20px",
+                    boxShadow: "rgba(99, 99, 99, 0.2) 0px 2px 8px 0px",
                   }}
                 >
-                  <Typography
+                  <Box
                     sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily: "Montserrat",
-                      margin: "10px 0",
+                      display: "flex",
+                      alignItems: "center",
+                      justifyContent: "space-between",
                     }}
                   >
-                    #1 FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận
-                    9, Thành phố Hồ Chí Minh
-                  </Typography>
-                  <Button>Chọn</Button>
+                    <Typography
+                      sx={{
+                        fontSize: "14px",
+                        fontWeight: 500,
+                        fontFamily: "Montserrat",
+                        margin: "10px 0",
+                      }}
+                    >
+                      #{index + 1} {value.endPoint}
+                    </Typography>
+                    <Button
+                      onClick={() => {
+                        setFormValue({ ...form, endPoint: value.endPoint });
+                      }}
+                    >
+                      Chọn
+                    </Button>
+                  </Box>
                 </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily: "Montserrat",
-                      margin: "10px 0",
-                    }}
-                  >
-                    #1 FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận
-                    9, Thành phố Hồ Chí Minh
-                  </Typography>
-                  <Button>Chọn</Button>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily: "Montserrat",
-                      margin: "10px 0",
-                    }}
-                  >
-                    #1 FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận
-                    9, Thành phố Hồ Chí Minh
-                  </Typography>
-                  <Button>Chọn</Button>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily: "Montserrat",
-                      margin: "10px 0",
-                    }}
-                  >
-                    #1 FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận
-                    9, Thành phố Hồ Chí Minh
-                  </Typography>
-                  <Button>Chọn</Button>
-                </Box>
-                <Box
-                  sx={{
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "space-between",
-                  }}
-                >
-                  <Typography
-                    sx={{
-                      fontSize: "14px",
-                      fontWeight: 500,
-                      fontFamily: "Montserrat",
-                      margin: "10px 0",
-                    }}
-                  >
-                    #1 FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận
-                    9, Thành phố Hồ Chí Minh
-                  </Typography>
-                  <Button>Chọn</Button>
-                </Box>
-              </Box>
-            </Box> */}
+              ))}
+            </Box>
 
             <Box>
               <Typography
@@ -545,7 +516,7 @@ const CallCenter = () => {
                 5 Cuộc gọi gần nhất
               </Typography>
               <Box>
-                {appointments.map((appointment) => (
+                {rideHistory.map((appointment) => (
                   <Box
                     key={appointment?.id}
                     sx={{
@@ -670,7 +641,7 @@ const CallCenter = () => {
             </Box>
           </Box>
         )}
-        {!appointments && <Box></Box>}
+        {!rideHistory && <Box></Box>}
       </Box>
     </Box>
   );

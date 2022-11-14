@@ -35,6 +35,10 @@ export class DriverToAppointmentService {
           appointmentId,
           action: "ACCEPTED",
         },
+        include: {
+          appointment: true,
+          driver: true,
+        },
       });
 
       return Promise.all(response);

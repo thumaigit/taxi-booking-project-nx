@@ -186,7 +186,7 @@ const Appointment = () => {
                   color: appointment?.driverId ? "green" : "#0a90d5",
                 }}
               >
-                {appointment?.driverId ? "Đã hoàn thành" : "Đang chờ điều phối"}
+                {appointment?.driverId ? "Đã điều phối" : "Đang chờ điều phối"}
               </Typography>
             </Box>
 

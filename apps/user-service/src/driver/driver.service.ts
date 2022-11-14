@@ -2,6 +2,7 @@ import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
 import { GoongService } from "../goong/goong.service";
 import { signInDto } from "./dto/signIn.dto";
+import { updateDriverDto } from "./dto/updateDriver.dto";
 
 const prisma = new PrismaClient();
 
@@ -20,6 +21,18 @@ export class DriverService {
 
       delete driver.password;
       return driver;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async findById(param) {
+    try {
+      return await prisma.driver.findFirstOrThrow({
+        where: {
+          id: param.id,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
@@ -70,6 +83,22 @@ export class DriverService {
   async createDriver(data) {
     try {
       const driver = await prisma.driver.create({
+        data,
+      });
+
+      delete driver.password;
+      return driver;
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
+  async updateDriver(param, data: updateDriverDto) {
+    try {
+      const driver = await prisma.driver.update({
+        where: {
+          id: param.id,
+        },
         data,
       });
 

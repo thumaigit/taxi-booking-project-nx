@@ -18,7 +18,7 @@ export class DispatcherController {
     return this.dispatcherService.createDispatcher(dto);
   }
 
-  @UseGuards(AuthGuard("jwt"))
+  // @UseGuards(AuthGuard("jwt"))
   @Get(":phone_number/ride")
   getRideByPhoneNumber(@Param("phone_number") phone_number: string) {
     const res = this.dispatcherService.getClientRide(phone_number);

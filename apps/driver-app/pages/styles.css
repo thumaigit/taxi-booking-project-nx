@@ -126,8 +126,8 @@ a {
   outline: 1px solid #ccc;
 }
 
-input[type="text"],
-input[type="password"] {
+.email-login input[type="text"],
+.email-login input[type="password"] {
   padding: 10px 20px;
   margin-top: 8px;
   margin-bottom: 15px;

@@ -28,7 +28,7 @@ export class DispatcherService {
   private socketClient: Socket;
 
   public constructor(private readonly twilioService: TwilioService) {
-    this.socketClient = io(process.env.USER_SERVICE_API);
+    this.socketClient = io("http://localhost:3000");
   }
 
   async getClientRide(phoneNumber: string): Promise<CallUser> {
@@ -104,12 +104,19 @@ export class DispatcherService {
     return user;
   }
 
-  async sendSMS(dto: any) {
-    const body = `Thong tin tai xe den don ban: ${dto.name}, ${dto.phoneNumber}.`
+  async sendSMS(dto) {
+    const { driver, customerPhone } = dto;
+
+    const body = `Tai xe dang den don ban.
+    Tai xe: ${driver.name},
+    So dien thoai: ${driver.phone}
+    Bien so: ${driver.carLicense},
+    Loai xe: ${driver.carName} - ${driver.carType}`;
+
     return this.twilioService.client.messages.create({
       body: body,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: dto.customerPhone,
+      to: customerPhone,
     });
   }
 
@@ -157,7 +164,7 @@ export class DispatcherService {
       ToZip: "",
     };
     const phoneNumber = data.From.replace("+84", "0");
-    this.socketClient.emit("NEW_INCOMING_CALL", '0987654321');
+    this.socketClient.emit("NEW_INCOMING_CALL", "0987654321");
     return data;
   }
 }
