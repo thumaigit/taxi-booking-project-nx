@@ -5,9 +5,11 @@ import {
   Param,
   Post,
   Put,
+  Query,
   UsePipes,
   ValidationPipe,
 } from "@nestjs/common";
+import { AppointmentQuery } from "./appointment.query";
 import { AppointmentService } from "./appointment.service";
 import { createAppointmentDto } from "./dto/createAppointment.dto";
 import { updateAppointmentDto } from "./dto/updateAppointment.dto";
@@ -23,7 +25,11 @@ import { updateAppointmentDto } from "./dto/updateAppointment.dto";
 export class AppointmentController {
   constructor(private readonly appointmentService: AppointmentService) {}
   @Get("")
-  findAll() {
+  findAll(@Query() query: AppointmentQuery) {
+    const { phone } = query;
+    if (phone) {
+      return this.appointmentService.findByPhone(query);
+    }
     return this.appointmentService.findAll();
   }
 
@@ -40,10 +46,5 @@ export class AppointmentController {
   @Get("/:id")
   findById(@Param() id: number) {
     return this.appointmentService.findById(+id);
-  }
-
-  @Get("/:phone")
-  findByPhone(@Param() phone: string) {
-    return this.appointmentService.findByPhone(phone);
   }
 }

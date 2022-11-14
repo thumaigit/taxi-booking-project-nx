@@ -156,7 +156,7 @@ export class DispatcherService {
       ToZip: "",
     };
     const phoneNumber = data.From.replace("+84", "0");
-    this.socketClient.emit("NEW_INCOMING_CALL", phoneNumber);
+    this.socketClient.emit("NEW_INCOMING_CALL", '0987654321');
     return data;
   }
 }

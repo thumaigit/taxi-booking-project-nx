@@ -28,6 +28,13 @@ export const userApi = createApi({
       }),
     }),
 
+    GetAppointmentByPhone: builder.mutation({
+      query: (query) => ({
+        url: `/appointment?limit=${query?.limit}&phone=${query?.clientPhone}`,
+        method: "GET",
+      }),
+    }),
+
     updateAppointment: builder.mutation({
       query: ({ id, body }) => ({
         url: `/appointment/${id}`,
@@ -48,6 +55,7 @@ export const userApi = createApi({
 export const {
   useCreateAppointmentMutation,
   useGetAllAppointmentMutation,
+  useGetAppointmentByPhoneMutation,
   useUpdateAppointmentMutation,
   useFindDriverByAppointmentMutation,
 } = userApi;
