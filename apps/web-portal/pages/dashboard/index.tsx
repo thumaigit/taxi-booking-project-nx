@@ -13,6 +13,7 @@ const Dashboard = () => {
       "FPT Software Ho Chi Minh - F-Town 3, Long Thạnh Mỹ, Quận 9, Thành phố Hồ Chí Minh",
     endPoint:
       "Vincom Landmark 81, 720A Điện Biên Phủ, Phường 22, Bình Thạnh, Thành phố Hồ Chí Minh",
+    carType: "",
   };
 
   const [createAppointment, createResult] = useCreateAppointmentMutation();

@@ -127,12 +127,14 @@ const Appointment = () => {
   }, [findDriverResult.isSuccess, findDriverResult.isLoading]);
 
   return (
-    <Box sx={{ display: "flex" }}>
+    <Box sx={{ display: "flex", padding: '0 30px' }}>
       <Box
         sx={{
           flex: 1,
           height: "100vh",
           overflow: "auto",
+          padding: "10px 0",
+          paddingRight: '20px'
         }}
       >
         {appointments.map((appointment) => (

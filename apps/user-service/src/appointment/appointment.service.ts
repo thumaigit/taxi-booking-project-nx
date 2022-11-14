@@ -22,12 +22,15 @@ export class AppointmentService {
     }
   }
 
-  async findByPhone(clientPhone: string) {
+  async findByPhone(query) {
+    const { phone: clientPhone, limit: take, offset: skip = 0 } = query;
     try {
       return await prisma.appointment.findMany({
         where: {
           clientPhone,
         },
+        take,
+        skip,
       });
     } catch (error) {
       console.log(error);
@@ -46,7 +49,8 @@ export class AppointmentService {
     }
   }
 
-  async createAppointment(data) {
+  async createAppointment(dto) {
+    const { carType, ...data } = dto;
     try {
       const appointment = await prisma.appointment.create({
         data,

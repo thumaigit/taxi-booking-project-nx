@@ -21,4 +21,8 @@ export class createAppointmentDto {
   @IsString()
   @IsNotEmpty()
   endPoint: string;
+
+  @ApiProperty()
+  @IsString()
+  carType?: string;
 }
