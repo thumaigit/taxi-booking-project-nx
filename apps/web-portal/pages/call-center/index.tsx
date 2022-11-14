@@ -7,6 +7,7 @@ import CloseIcon from "@mui/icons-material/Close";
 import FmdGoodIcon from "@mui/icons-material/FmdGood";
 import LocalPhoneOutlinedIcon from "@mui/icons-material/LocalPhoneOutlined";
 import Alert from "@mui/material/Alert";
+import LogoutOutlinedIcon from "@mui/icons-material/LogoutOutlined";
 
 import {
   useCreateAppointmentMutation,
@@ -22,6 +23,9 @@ import {
   Typography,
 } from "@mui/material";
 import { useContext, useEffect, useState } from "react";
+import { useRouter } from "next/router";
+import { useDispatch } from "react-redux";
+import { clearStore } from "@@store/appSlice";
 
 const CallCenter = () => {
   const socket = useContext(WebsocketContext);
@@ -34,6 +38,8 @@ const CallCenter = () => {
     payment: "cash",
   };
 
+  const router = useRouter();
+  const dispatch = useDispatch();
   const [alert, setAlert] = useState(null);
   const [token, setToken] = useState("");
   const [rideHistory, setRideHistory] = useState(null);
@@ -49,8 +55,6 @@ const CallCenter = () => {
       [e.target.name]: e.target.value,
     });
   };
-
-  const [incomingCallPhone, setIncomingCallPhone] = useState("");
 
   useEffect(() => {
     socket.on("newIncomingCall", (clientPhone) => {
@@ -68,6 +72,11 @@ const CallCenter = () => {
   const handleSubmit = (e) => {
     e.preventDefault();
     createAppointment(form);
+  };
+
+  const handleLogout = () => {
+    dispatch(clearStore());
+    router.push("/login");
   };
   const handleCheckPhoneNumber = () => {
     const { clientPhone } = form;
@@ -116,68 +125,126 @@ const CallCenter = () => {
 
   return (
     <Box sx={{ display: "flex" }}>
-      <Box sx={{ flex: 2, padding: "20px" }}>
-        <Typography
-          sx={{
-            fontSize: "20px",
-            fontWeight: 600,
-            fontFamily: "Montserrat",
-            color: "#FF7F00",
-            margin: "10px 0",
-          }}
-        >
-          Booking Now
-        </Typography>
-        <Box
-          sx={{
-            height: "70px",
-          }}
-        >
-          {alert && (
-            <Alert
-              severity={alert?.severity || "success"}
-              action={
-                <IconButton
-                  aria-label="close"
-                  color="inherit"
-                  size="small"
-                  onClick={() => {
-                    setAlert(null);
-                  }}
-                >
-                  <CloseIcon fontSize="inherit" />
-                </IconButton>
-              }
-              sx={{ mb: 2, fontFamily: "Montserrat", fontWeight: 600 }}
-            >
-              {alert?.message}
-            </Alert>
-          )}
-        </Box>
-        <Box sx={{ color: "#00155F" }}>
-          <form>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                fontFamily: "Montserrat",
-                marginBottom: "10px",
-                flexDirection: "column",
-                color: "#555",
-              }}
-            >
-              <Typography
+      <Box
+        sx={{
+          flex: 2,
+          padding: "20px",
+          display: "flex",
+          flexDirection: "column",
+          justifyContent: "space-between",
+        }}
+      >
+        <Box>
+          <Typography
+            sx={{
+              fontSize: "20px",
+              fontWeight: 600,
+              fontFamily: "Montserrat",
+              color: "#FF7F00",
+            }}
+          >
+            Booking Now
+          </Typography>
+          <Box
+            sx={{
+              height: "70px",
+            }}
+          >
+            {alert && (
+              <Alert
+                severity={alert?.severity || "success"}
+                action={
+                  <IconButton
+                    aria-label="close"
+                    color="inherit"
+                    size="small"
+                    onClick={() => {
+                      setAlert(null);
+                    }}
+                  >
+                    <CloseIcon fontSize="inherit" />
+                  </IconButton>
+                }
+                sx={{ mb: 2, fontFamily: "Montserrat", fontWeight: 600 }}
+              >
+                {alert?.message}
+              </Alert>
+            )}
+          </Box>
+          <Box sx={{ color: "#00155F" }}>
+            <form>
+              <Box
                 sx={{
+                  flex: 1,
+                  display: "flex",
                   fontFamily: "Montserrat",
-                  fontWeight: 500,
-                  marginRight: "10px",
-                  fontSize: "15px",
-                  marginBottom: "5px",
+                  marginBottom: "10px",
+                  flexDirection: "column",
+                  color: "#555",
                 }}
               >
-                Số điện thoại:{" "}
-              </Typography>
-              <Box sx={{ display: "flex" }}>
+                <Typography
+                  sx={{
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
+                  }}
+                >
+                  Số điện thoại:{" "}
+                </Typography>
+                <Box sx={{ display: "flex" }}>
+                  <TextField
+                    size="small"
+                    sx={{
+                      flex: 1,
+                      fontFamily: "Montserrat",
+                      fontWeight: 500,
+                    }}
+                    value={form.clientPhone}
+                    type="text"
+                    name="clientPhone"
+                    onChange={updateField}
+                    inputProps={{
+                      style: {
+                        padding: "5px 10px",
+                      },
+                    }}
+                    required
+                  />
+                  <Button
+                    sx={{
+                      fontFamily: "Montserrat",
+                      padding: "5px 10px",
+                    }}
+                    onClick={handleCheckPhoneNumber}
+                  >
+                    Kiểm tra
+                  </Button>
+                </Box>
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  fontFamily: "Montserrat",
+                  marginBottom: "10px",
+                  flexDirection: "column",
+                  color: "#555",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
+                  }}
+                >
+                  Tên khách hàng:{" "}
+                </Typography>
                 <TextField
                   size="small"
                   sx={{
@@ -185,9 +252,9 @@ const CallCenter = () => {
                     fontFamily: "Montserrat",
                     fontWeight: 500,
                   }}
-                  value={form.clientPhone}
+                  value={form.clientName}
                   type="text"
-                  name="clientPhone"
+                  name="clientName"
                   onChange={updateField}
                   inputProps={{
                     style: {
@@ -196,247 +263,244 @@ const CallCenter = () => {
                   }}
                   required
                 />
-                <Button
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  fontFamily: "Montserrat",
+                  marginBottom: "10px",
+                  flexDirection: "column",
+                  color: "#555",
+                }}
+              >
+                <Typography
                   sx={{
                     fontFamily: "Montserrat",
-                    padding: "5px 10px",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
                   }}
-                  onClick={handleCheckPhoneNumber}
                 >
-                  Kiểm tra
+                  Địa điểm đón khách:{" "}
+                </Typography>
+                <TextField
+                  size="small"
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                  }}
+                  value={form.startPoint}
+                  type="text"
+                  name="startPoint"
+                  onChange={updateField}
+                  inputProps={{
+                    style: {
+                      padding: "5px 10px",
+                    },
+                  }}
+                  required
+                />
+              </Box>
+              <Box
+                sx={{
+                  flex: 1,
+                  display: "flex",
+                  fontFamily: "Montserrat",
+                  marginBottom: "10px",
+                  flexDirection: "column",
+                  color: "#555",
+                }}
+              >
+                <Typography
+                  sx={{
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                    marginRight: "10px",
+                    fontSize: "15px",
+                    marginBottom: "5px",
+                  }}
+                >
+                  Địa điểm trả khách:{" "}
+                </Typography>
+                <TextField
+                  size="small"
+                  sx={{
+                    flex: 1,
+                    fontFamily: "Montserrat",
+                    fontWeight: 500,
+                  }}
+                  value={form.endPoint}
+                  type="text"
+                  name="endPoint"
+                  onChange={updateField}
+                  inputProps={{
+                    style: {
+                      padding: "5px 10px",
+                    },
+                  }}
+                  required
+                />
+              </Box>
+              <Box sx={{ display: "flex" }}>
+                <Box>
+                  <Typography
+                    sx={{
+                      fontFamily: "Montserrat",
+                      fontWeight: 500,
+                      marginRight: "10px",
+                      fontSize: "15px",
+                      marginBottom: "5px",
+                      color: "#555",
+                    }}
+                  >
+                    Loại xe:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Select
+                      size="small"
+                      value={form.carType}
+                      name={"carType"}
+                      onChange={updateField}
+                      displayEmpty
+                      inputProps={{
+                        sx: {
+                          fontFamily: "Montserrat",
+                          fontWeight: 500,
+                          fontSize: "15px",
+                          padding: "5px 20px",
+                          textAlign: "center",
+                        },
+                      }}
+                    >
+                      <MenuItem
+                        sx={{ fontFamily: "Montserrat" }}
+                        value={"4 chỗ"}
+                      >
+                        4 chỗ
+                      </MenuItem>
+                      <MenuItem
+                        sx={{ fontFamily: "Montserrat" }}
+                        value={"7 chỗ"}
+                      >
+                        7 chỗ
+                      </MenuItem>
+                      <MenuItem sx={{ fontFamily: "Montserrat" }} value="any">
+                        Bất kỳ
+                      </MenuItem>
+                    </Select>
+                  </Box>
+                </Box>
+                <Box sx={{ ml: "20px" }}>
+                  <Typography
+                    sx={{
+                      fontFamily: "Montserrat",
+                      fontWeight: 500,
+                      marginRight: "10px",
+                      fontSize: "15px",
+                      marginBottom: "5px",
+                      color: "#555",
+                    }}
+                  >
+                    Hình thức thanh toán:
+                  </Typography>
+                  <Box
+                    sx={{
+                      display: "flex",
+                      justifyContent: "space-between",
+                      alignItems: "center",
+                    }}
+                  >
+                    <Select
+                      size="small"
+                      value={form.payment}
+                      name={"payment"}
+                      onChange={updateField}
+                      displayEmpty
+                      inputProps={{
+                        sx: {
+                          fontFamily: "Montserrat",
+                          fontWeight: 500,
+                          fontSize: "15px",
+                          padding: "5px 20px",
+                          textAlign: "center",
+                        },
+                      }}
+                    >
+                      <MenuItem
+                        sx={{ fontFamily: "Montserrat" }}
+                        value={"cash"}
+                      >
+                        Thanh toán bằng tiền mặt
+                      </MenuItem>
+                      <MenuItem
+                        sx={{ fontFamily: "Montserrat" }}
+                        value={"card"}
+                      >
+                        Thanh toán qua thẻ
+                      </MenuItem>
+                    </Select>
+                  </Box>
+                </Box>
+              </Box>
+              <Box sx={{ mt: "20px" }}>
+                <Button
+                  variant="contained"
+                  sx={{
+                    fontFamily: "Montserrat",
+                    fontWeight: 600,
+                    background: "#00155F",
+                    minWidth: "200px",
+                  }}
+                  onClick={handleSubmit}
+                >
+                  Đặt xe
                 </Button>
               </Box>
-            </Box>
-            <Box
+            </form>
+          </Box>
+        </Box>
+        <Box sx={{ borderTop: "1px solid #ccc", color: "#00155F" }}>
+          <Typography
+            sx={{
+              fontSize: "15px",
+              fontWeight: 600,
+              fontFamily: "Montserrat",
+              marginTop: "20px",
+            }}
+          >
+            Chào mừng bạn
+          </Typography>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Typography
               sx={{
-                flex: 1,
-                display: "flex",
+                fontSize: "15px",
+                fontWeight: 500,
                 fontFamily: "Montserrat",
-                marginBottom: "10px",
-                flexDirection: "column",
-                color: "#555",
+                margin: "10px 0",
               }}
             >
-              <Typography
-                sx={{
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                  marginRight: "10px",
-                  fontSize: "15px",
-                  marginBottom: "5px",
-                }}
-              >
-                Tên khách hàng:{" "}
-              </Typography>
-              <TextField
-                size="small"
-                sx={{
-                  flex: 1,
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                }}
-                value={form.clientName}
-                type="text"
-                name="clientName"
-                onChange={updateField}
-                inputProps={{
-                  style: {
-                    padding: "5px 10px",
-                  },
-                }}
-                required
-              />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                fontFamily: "Montserrat",
-                marginBottom: "10px",
-                flexDirection: "column",
-                color: "#555",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                  marginRight: "10px",
-                  fontSize: "15px",
-                  marginBottom: "5px",
-                }}
-              >
-                Địa điểm đón khách:{" "}
-              </Typography>
-              <TextField
-                size="small"
-                sx={{
-                  flex: 1,
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                }}
-                value={form.startPoint}
-                type="text"
-                name="startPoint"
-                onChange={updateField}
-                inputProps={{
-                  style: {
-                    padding: "5px 10px",
-                  },
-                }}
-                required
-              />
-            </Box>
-            <Box
-              sx={{
-                flex: 1,
-                display: "flex",
-                fontFamily: "Montserrat",
-                marginBottom: "10px",
-                flexDirection: "column",
-                color: "#555",
-              }}
-            >
-              <Typography
-                sx={{
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                  marginRight: "10px",
-                  fontSize: "15px",
-                  marginBottom: "5px",
-                }}
-              >
-                Địa điểm trả khách:{" "}
-              </Typography>
-              <TextField
-                size="small"
-                sx={{
-                  flex: 1,
-                  fontFamily: "Montserrat",
-                  fontWeight: 500,
-                }}
-                value={form.endPoint}
-                type="text"
-                name="endPoint"
-                onChange={updateField}
-                inputProps={{
-                  style: {
-                    padding: "5px 10px",
-                  },
-                }}
-                required
-              />
-            </Box>
-            <Box sx={{ display: "flex" }}>
-              <Box>
-                <Typography
-                  sx={{
-                    fontFamily: "Montserrat",
-                    fontWeight: 500,
-                    marginRight: "10px",
-                    fontSize: "15px",
-                    marginBottom: "5px",
-                    color: "#555",
-                  }}
-                >
-                  Loại xe:
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Select
-                    size="small"
-                    value={form.carType}
-                    name={"carType"}
-                    onChange={updateField}
-                    displayEmpty
-                    inputProps={{
-                      sx: {
-                        fontFamily: "Montserrat",
-                        fontWeight: 500,
-                        fontSize: "15px",
-                        padding: "5px 20px",
-                        textAlign: "center",
-                      },
-                    }}
-                  >
-                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"4 chỗ"}>
-                      4 chỗ
-                    </MenuItem>
-                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"7 chỗ"}>
-                      7 chỗ
-                    </MenuItem>
-                    <MenuItem sx={{ fontFamily: "Montserrat" }} value="any">
-                      Bất kỳ
-                    </MenuItem>
-                  </Select>
-                </Box>
-              </Box>
-              <Box sx={{ ml: "20px" }}>
-                <Typography
-                  sx={{
-                    fontFamily: "Montserrat",
-                    fontWeight: 500,
-                    marginRight: "10px",
-                    fontSize: "15px",
-                    marginBottom: "5px",
-                    color: "#555",
-                  }}
-                >
-                  Hình thức thanh toán:
-                </Typography>
-                <Box
-                  sx={{
-                    display: "flex",
-                    justifyContent: "space-between",
-                    alignItems: "center",
-                  }}
-                >
-                  <Select
-                    size="small"
-                    value={form.payment}
-                    name={"payment"}
-                    onChange={updateField}
-                    displayEmpty
-                    inputProps={{
-                      sx: {
-                        fontFamily: "Montserrat",
-                        fontWeight: 500,
-                        fontSize: "15px",
-                        padding: "5px 20px",
-                        textAlign: "center",
-                      },
-                    }}
-                  >
-                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"cash"}>
-                      Thanh toán bằng tiền mặt
-                    </MenuItem>
-                    <MenuItem sx={{ fontFamily: "Montserrat" }} value={"card"}>
-                      Thanh toán qua thẻ
-                    </MenuItem>
-                  </Select>
-                </Box>
-              </Box>
-            </Box>
-            <Box sx={{ mt: "20px" }}>
-              <Button
-                variant="contained"
-                sx={{
-                  fontFamily: "Montserrat",
-                  fontWeight: 600,
-                  background: "#00155F",
-                  minWidth: "200px",
-                }}
-                onClick={handleSubmit}
-              >
-                Đặt xe
-              </Button>
-            </Box>
-          </form>
+              Thư Mai
+            </Typography>
+            <LogoutOutlinedIcon
+              onClick={handleLogout}
+              sx={{ fontSize: "30px", cursor: "pointer", color: "#333" }}
+            />
+          </Box>
         </Box>
       </Box>
 
