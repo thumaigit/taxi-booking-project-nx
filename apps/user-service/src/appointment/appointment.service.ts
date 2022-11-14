@@ -1,15 +1,12 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
-import { retry } from "rxjs";
-import { GoongService } from "../goong/goong.service";
+import { createError } from "../errors/errors";
 import { updateAppointmentDto } from "./dto/updateAppointment.dto";
 
 const prisma = new PrismaClient();
 
 @Injectable()
 export class AppointmentService {
-  constructor(private readonly goongService: GoongService) {}
-
   async findAll() {
     try {
       return await prisma.appointment.findMany({
@@ -18,7 +15,7 @@ export class AppointmentService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError("Appointment", error);
     }
   }
 
@@ -33,7 +30,7 @@ export class AppointmentService {
         skip,
       });
     } catch (error) {
-      console.log(error);
+      throw createError("Appointment", error);
     }
   }
 
@@ -45,7 +42,7 @@ export class AppointmentService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError("Appointment", error);
     }
   }
 
@@ -58,7 +55,7 @@ export class AppointmentService {
 
       return appointment;
     } catch (error) {
-      console.log(error);
+      throw createError("Appointment", error);
     }
   }
 
@@ -72,13 +69,13 @@ export class AppointmentService {
           ...data,
         },
         include: {
-          driverAssigned: true
-        }
+          driverAssigned: true,
+        },
       });
 
       return appointment;
     } catch (error) {
-      console.log(error);
+      throw createError("Appointment", error);
     }
   }
 }

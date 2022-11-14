@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { createError } from "../errors/errors";
 
 const prisma = new PrismaClient();
 
@@ -24,7 +25,7 @@ export class DriverToAppointmentService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError("DriverToAppointment", error);
     }
   }
 
@@ -43,7 +44,7 @@ export class DriverToAppointmentService {
 
       return Promise.all(response);
     } catch (error) {
-      console.log(error);
+      throw createError("DriverToAppointment", error);
     }
   }
 
@@ -54,7 +55,7 @@ export class DriverToAppointmentService {
       });
       return;
     } catch (error) {
-      console.log(error);
+      throw createError("DriverToAppointment", error);
     }
   }
 
@@ -72,7 +73,7 @@ export class DriverToAppointmentService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError("DriverToAppointment", error);
     }
   }
 
@@ -84,7 +85,7 @@ export class DriverToAppointmentService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError("DriverToAppointment", error);
     }
   }
 }

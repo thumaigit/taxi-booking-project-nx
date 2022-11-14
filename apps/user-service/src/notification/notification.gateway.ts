@@ -106,13 +106,6 @@ export class NotificationGateway
     }, 15000);
   }
 
-  @SubscribeMessage("ASSIGN_APPOINTMENT")
-  async assignAppointment(driver: Socket, payload) {
-    const room_id = "car:567";
-    driver.join(room_id);
-    driver.broadcast.emit("assignAppointment", { payload, room_id: room_id });
-  }
-
   // Driver action
   @SubscribeMessage("ACCEPT_APPOINTMENT")
   async handleAccept(driver: Socket, payload) {
@@ -166,14 +159,6 @@ export class NotificationGateway
   @SubscribeMessage("DRIVER_READY")
   async handleReady(driver: Socket, payload) {
     driver.join(`driver-${payload.id}`);
-    driver.join("driversReady");
-    driver.emit("driversReady", { payload });
-  }
-
-  @SubscribeMessage("DRIVER_BUSY")
-  async handleBusy(driver: Socket, payload) {
-    driver.join("driverBusy");
-    driver.emit("driverBusy", { payload });
   }
 
   @SubscribeMessage("DRIVER_OFFLINE")

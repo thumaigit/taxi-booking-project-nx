@@ -2,7 +2,7 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 import { formatPhoneNumber } from "@@common/formatPhoneNumber";
 import { WebsocketContext } from "@@contexts/WebsocketContext";
-import { useUpdateDriverMutation } from "@@store/api";
+import { useFindByIdMutation, useUpdateDriverMutation } from "@@store/api";
 import { setDriver } from "@@store/appSlice";
 import { AppState } from "@@store/store";
 import AdjustIcon from "@mui/icons-material/Adjust";
@@ -16,12 +16,14 @@ import { Box, Button, TextField, Typography } from "@mui/material";
 import CircularProgress from "@mui/material/CircularProgress";
 import LinearProgress from "@mui/material/LinearProgress";
 import Switch from "@mui/material/Switch";
+import { useRouter } from "next/router";
 import { useContext, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 
 const Dashboard = () => {
   const socket = useContext(WebsocketContext);
   const dispatch = useDispatch();
+  const router = useRouter();
   const driver = useSelector((state: AppState) => state.app.driver);
   const [newAppointment, setNewAppointment] = useState(null);
   const [appointmentAssigned, setAppointmentAsigned] = useState(null);
@@ -30,6 +32,8 @@ const Dashboard = () => {
   const [isWaiting, setIsWaiting] = useState(false);
   const [isAlreadyAssign, setIsAlreadyAssign] = useState(false);
   const [updateDriver, updateResult] = useUpdateDriverMutation();
+  const [getDriver, getResult] = useFindByIdMutation();
+
   const handleToggleStatus = () => {
     setIsOnline(!isOnline);
   };
@@ -75,6 +79,24 @@ const Dashboard = () => {
       }, 4000);
     }
   }, [isAlreadyAssign]);
+
+  useEffect(() => {
+    if (driver.id) {
+      getDriver(driver.id);
+    }
+  }, []);
+
+  useEffect(() => {
+    if (getResult.isSuccess) {
+      dispatch(setDriver(getResult.data));
+    }
+  }, [getResult.isSuccess]);
+
+  useEffect(() => {
+    if (getResult.isError) {
+      router.push("/sign-in")
+    }
+  }, [getResult.isError]);
 
   const onAccept = async () => {
     await socket.emit("ACCEPT_APPOINTMENT", {

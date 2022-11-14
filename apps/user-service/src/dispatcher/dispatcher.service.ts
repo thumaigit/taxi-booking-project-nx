@@ -3,6 +3,7 @@ import { Appointment, Dispatcher, PrismaClient } from "@prisma/client";
 import * as bcrypt from "bcrypt";
 import { TwilioService } from "nestjs-twilio";
 import { io, Socket } from "socket.io-client";
+import { createError } from "../errors/errors";
 
 const prisma = new PrismaClient();
 
@@ -32,62 +33,78 @@ export class DispatcherService {
   }
 
   async getClientRide(phoneNumber: string): Promise<CallUser> {
-    const client = await prisma.client.findUnique({
-      where: {
-        phone_number: phoneNumber,
-      },
-    });
-
-    const rides = await prisma.appointment.findMany({
-      where: {
-        clientPhone: phoneNumber,
-      },
-    });
-
-    const clientFrequentlyAddress = await prisma.appointment.groupBy({
-      where: {
-        clientPhone: phoneNumber,
-      },
-      by: ["endPoint"],
-      orderBy: {
-        _count: {
-          endPoint: "desc",
+    try {
+      const client = await prisma.client.findUnique({
+        where: {
+          phone_number: phoneNumber,
         },
-      },
-      take: 5,
-    });
+      });
 
-    return {
-      basic_info: {
-        user_id: client?.id,
-        full_name: client?.full_name,
-        phone_number: client?.phone_number,
-      },
-      ride_history: rides,
-      frequently_address: clientFrequentlyAddress,
-    };
+      const rides = await prisma.appointment.findMany({
+        where: {
+          clientPhone: phoneNumber,
+        },
+        orderBy: { createdAt: "desc" },
+        skip: 0,
+        take: 5,
+      });
+
+      const clientFrequentlyAddress = await prisma.appointment.groupBy({
+        where: {
+          clientPhone: phoneNumber,
+        },
+        by: ["endPoint"],
+        orderBy: {
+          _count: {
+            endPoint: "desc",
+          },
+        },
+        skip: 0,
+        take: 5,
+      });
+
+      return {
+        basic_info: {
+          user_id: client?.id,
+          full_name: client?.full_name,
+          phone_number: client?.phone_number,
+        },
+        ride_history: rides,
+        frequently_address: clientFrequentlyAddress,
+      };
+    } catch (error) {
+      throw createError("Dispatcher", error);
+    }
   }
 
   async findDispatcher(phoneNumber: string): Promise<Dispatcher> {
-    const dispatcher = await prisma.dispatcher.findUnique({
-      where: {
-        phone_number: phoneNumber,
-      },
-    });
-    return dispatcher;
+    try {
+      const dispatcher = await prisma.dispatcher.findUnique({
+        where: {
+          phone_number: phoneNumber,
+        },
+      });
+      return dispatcher;
+    } catch (error) {
+      throw createError("Dispatcher", error);
+    }
   }
 
   async findLoginDispatcher(phoneNumber: string): Promise<LoginUserResponse> {
-    const user = await prisma.dispatcher.findUnique({
-      where: {
-        phone_number: phoneNumber,
-      },
-    });
-    const loginUser = {
-      phone_number: user.phone_number,
-      user_password: user.user_password,
-    };
-    return loginUser;
+    try {
+      const user = await prisma.dispatcher.findUnique({
+        where: {
+          phone_number: phoneNumber,
+        },
+      });
+      const loginUser = {
+        phone_number: user.phone_number,
+        user_password: user.user_password,
+      };
+      return loginUser;
+    } catch (error) {
+      throw createError("Dispatcher", error);
+    }
   }
 
   async createDispatcher(dto: any): Promise<CreateUserResponse> {
@@ -95,13 +112,17 @@ export class DispatcherService {
     const password = dto.user_password;
     const hash = await bcrypt.hash(password, saltOrRounds);
 
-    const user = await prisma.dispatcher.create({
-      data: {
-        ...dto,
-        user_password: hash,
-      },
-    });
-    return user;
+    try {
+      const user = await prisma.dispatcher.create({
+        data: {
+          ...dto,
+          user_password: hash,
+        },
+      });
+      return user;
+    } catch (error) {
+      throw createError("Dispatcher", error);
+    }
   }
 
   async sendSMS(data) {

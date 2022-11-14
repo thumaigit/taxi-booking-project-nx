@@ -23,7 +23,7 @@ export const userApi = createApi({
 
     findById: builder.mutation({
       query: (id: string) => ({
-        url: "/driver/sign-in",
+        url: `/driver/${id}`,
         method: "GET",
       }),
     }),

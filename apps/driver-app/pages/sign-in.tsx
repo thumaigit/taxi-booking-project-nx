@@ -1,5 +1,6 @@
 import { useSignInMutation } from "@@store/api";
 import { setDriver } from "@@store/appSlice";
+import { Typography } from "@mui/material";
 import Link from "next/link";
 import { useRouter } from "next/router";
 import React, { useEffect, useState } from "react";
@@ -8,8 +9,7 @@ import { useDispatch } from "react-redux";
 const SignIn = () => {
   const router = useRouter();
   const dispatch = useDispatch();
-  const [signIn, { isError, isSuccess, data, error }] = useSignInMutation();
-
+  const [signIn, { isSuccess, data, isError }] = useSignInMutation();
   const [form, setValues] = useState({
     phone: "",
     password: "",
@@ -57,6 +57,18 @@ const SignIn = () => {
             required
           />
         </div>
+        {isError && (
+          <Typography
+            sx={{
+              color: "red",
+              textAlign: "center",
+              fontFamily: "Montserrat",
+              fontSize: "14px",
+            }}
+          >
+            Thông tin đăng nhập không chính xác
+          </Typography>
+        )}
         <button onClick={onSubmit} className="cta-btn">
           Đăng nhập
         </button>

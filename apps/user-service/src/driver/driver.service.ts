@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import { PrismaClient } from "@prisma/client";
+import { createError } from "../errors/errors";
 import { GoongService } from "../goong/goong.service";
 import { signInDto } from "./dto/signIn.dto";
 import { updateDriverDto } from "./dto/updateDriver.dto";
@@ -22,7 +23,7 @@ export class DriverService {
       delete driver.password;
       return driver;
     } catch (error) {
-      console.log(error);
+      throw createError('Driver', error);
     }
   }
 
@@ -34,7 +35,7 @@ export class DriverService {
         },
       });
     } catch (error) {
-      console.log(error);
+      throw createError('Driver', error);
     }
   }
 
@@ -76,7 +77,7 @@ export class DriverService {
         return results.filter((driver) => driver?.id != undefined);
       });
     } catch (error) {
-      console.log(error);
+      throw createError('Driver', error);
     }
   }
 
@@ -89,7 +90,7 @@ export class DriverService {
       delete driver.password;
       return driver;
     } catch (error) {
-      console.log(error);
+      throw createError('Driver', error);
     }
   }
 
@@ -105,7 +106,7 @@ export class DriverService {
       delete driver.password;
       return driver;
     } catch (error) {
-      console.log(error);
+      throw createError('Driver', error);
     }
   }
 }

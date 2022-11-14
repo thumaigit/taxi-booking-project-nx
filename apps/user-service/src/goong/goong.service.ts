@@ -1,5 +1,6 @@
 import { Injectable } from "@nestjs/common";
 import Axios from "axios";
+import { createError } from "../errors/errors";
 
 const goongKey = "uC7YdzCuGXzTglhZarY9mTdplJf2omnxdiOSbbf4";
 const goong = "https://rsapi.goong.io";
@@ -12,8 +13,8 @@ export class GoongService {
       const geoCoding = await Axios.get(url);
       const location = geoCoding.data.results[0].geometry.location;
       return location;
-    } catch (e) {
-      console.error("getLocation error");
+    } catch (error) {
+      throw createError("Goong", error);
     }
   }
 
@@ -24,7 +25,7 @@ export class GoongService {
       const distance = direction.data.routes[0].legs[0];
       return distance;
     } catch (error) {
-      console.error("getDistance error");
+      throw createError("Goong", error);
     }
   }
 }

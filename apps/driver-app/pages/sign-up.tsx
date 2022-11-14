@@ -47,7 +47,7 @@ const SignIn = () => {
             Đăng nhập
           </button>
           <Link className="forget-pass" href="/sign-in">
-            <a className="forget-pass"> Chưa có tài khoản? Đăng ký</a>
+            <a className="forget-pass"> Đã có tài khoản? Đăng nhập</a>
           </Link>
         </form>
       </div>
