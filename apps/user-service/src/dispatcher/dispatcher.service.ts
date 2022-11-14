@@ -104,11 +104,12 @@ export class DispatcherService {
     return user;
   }
 
-  async sendSMS(customer_phone: string) {
+  async sendSMS(dto: any) {
+    const body = `Thong tin tai xe den don ban: ${dto.name}, ${dto.phoneNumber}.`
     return this.twilioService.client.messages.create({
-      body: "SMS Body, sent to the phone!",
+      body: body,
       from: process.env.TWILIO_PHONE_NUMBER,
-      to: customer_phone,
+      to: dto.customerPhone,
     });
   }
 

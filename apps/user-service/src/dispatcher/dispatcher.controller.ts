@@ -33,11 +33,9 @@ export class DispatcherController {
   }
 
   @UseGuards(AuthGuard("jwt"))
-  @Get(":customer_phone/sms")
-  sentSmsCustomer(
-    @Param("customer_phone") customer_phone: string
-  ): Promise<any> {
-    const result = this.dispatcherService.sendSMS(customer_phone);
+  @Post(":customer_phone/sms")
+  sentSmsCustomer(@Body() dto: any) {
+    const result = this.dispatcherService.sendSMS(dto);
     return result;
   }
 
